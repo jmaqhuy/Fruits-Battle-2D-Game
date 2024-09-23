@@ -21,4 +21,9 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("Shop");
     }
+    
+    public void SelectPlayMode()
+    {
+        SceneManager.LoadScene("Select Play Mode");
+    }
 }

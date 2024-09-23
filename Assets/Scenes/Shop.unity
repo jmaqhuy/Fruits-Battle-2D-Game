@@ -1516,9 +1516,9 @@ RectTransform:
   - {fileID: 1414822270}
   m_Father: {fileID: 695103763}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -390}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1100, y: 780}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &156440179
@@ -3521,7 +3521,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 658988303}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1751970313}
+        m_TargetAssemblyTypeName: Shop, Assembly-CSharp
+        m_MethodName: ButtonBack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &658988303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5206,9 +5218,9 @@ RectTransform:
   - {fileID: 1501370333}
   m_Father: {fileID: 695103763}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2752, y: -390}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1100, y: 780}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1180923707
@@ -6646,9 +6658,9 @@ RectTransform:
   - {fileID: 63208227}
   m_Father: {fileID: 695103763}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1651, y: -390}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1100, y: 780}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1697010164
@@ -6744,6 +6756,7 @@ GameObject:
   - component: {fileID: 1751970312}
   - component: {fileID: 1751970311}
   - component: {fileID: 1751970310}
+  - component: {fileID: 1751970313}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -6825,6 +6838,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1751970313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751970309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77ab80df8f3a7204cae4530f226c4c27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1803907299
 PrefabInstance:
   m_ObjectHideFlags: 0
