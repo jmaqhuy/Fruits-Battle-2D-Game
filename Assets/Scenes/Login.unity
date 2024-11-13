@@ -2772,6 +2772,7 @@ GameObject:
   - component: {fileID: 768742531}
   - component: {fileID: 768742530}
   - component: {fileID: 768742529}
+  - component: {fileID: 768742532}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2853,6 +2854,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &768742532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 768742528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42dd7b42cae93244bb1b0325dd616bbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &793181538
 GameObject:
   m_ObjectHideFlags: 0
@@ -4018,7 +4031,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1096659107}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 768742532}
+        m_TargetAssemblyTypeName: LoginScript, Assembly-CSharp
+        m_MethodName: LoginSuccessful
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1096659107
 MonoBehaviour:
   m_ObjectHideFlags: 0

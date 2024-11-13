@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Select Play Mode.unity
     guid: e507528d3b5b7424c8f1b6ed0a0a1051
+  - enabled: 1
+    path: Assets/Scenes/Login.unity
+    guid: 67abe880c9e573844938fbc253de4d6f
+  - enabled: 1
+    path: Assets/Scenes/Waiting Room.unity
+    guid: f84a323ba8cefae41abeae161e45f74e
   m_configObjects: {}
