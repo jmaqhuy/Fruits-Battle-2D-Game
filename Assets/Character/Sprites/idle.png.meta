@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f7bb5796e396e8840b4ba57a71971325
+guid: aac2d706dad5ae4439725a4b94dfba9e
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Banana idle_0
+      name: idle_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 2135.3335
-        width: 1066.75
-        height: 1067.6666
+        y: 256.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -111,20 +111,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 676cd82328dcffd4bad594be85ff2b25
-      internalID: 795332963
+      spriteID: ad6768d593eab324081c7dd6e31dfc54
+      internalID: -1467855651
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banana idle_1
+      name: idle_1
       rect:
         serializedVersion: 2
-        x: 1066
-        y: 2135.3335
-        width: 1066.75
-        height: 1067.6666
+        x: 256
+        y: 256.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -132,20 +132,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 45c88bdec1abc2a47964aced56dcc16d
-      internalID: 460589510
+      spriteID: d7e5923f210827c4caad284644ed2e9d
+      internalID: 2071347907
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banana idle_2
+      name: idle_2
       rect:
         serializedVersion: 2
-        x: 2132
-        y: 2135.3335
-        width: 1066.75
-        height: 1067.6666
+        x: 512
+        y: 256.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,20 +153,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 083f03cb1ff04164ca0a1a50faae38e0
-      internalID: 1964715890
+      spriteID: 36f5bb4fa37820241b0f31b36c241475
+      internalID: 2109200974
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banana idle_3
+      name: idle_3
       rect:
         serializedVersion: 2
-        x: 3198
-        y: 2135.3335
-        width: 1066.75
-        height: 1067.6666
+        x: 768
+        y: 256.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,104 +174,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4122030c2801e5f4588ed00a4f88b7e3
-      internalID: -107382597
+      spriteID: a559a84b48674564a9d9914ff580806d
+      internalID: 1416567275
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banana idle_4
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 1068.3334
-        width: 1066.75
-        height: 1067.6666
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3eb4decea40c0a44e81480f4c569b4d2
-      internalID: -1647537305
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Banana idle_5
-      rect:
-        serializedVersion: 2
-        x: 1066
-        y: 1068.3334
-        width: 1066.75
-        height: 1067.6666
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fc343d0e988b77d44a92a8409bf8fdeb
-      internalID: 1908067287
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Banana idle_6
-      rect:
-        serializedVersion: 2
-        x: 2132
-        y: 1068.3334
-        width: 1066.75
-        height: 1067.6666
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c6f0bc3e1d767484fb36beec825b54fe
-      internalID: 680652374
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Banana idle_7
-      rect:
-        serializedVersion: 2
-        x: 3198
-        y: 1068.3334
-        width: 1066.75
-        height: 1067.6666
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 506ed744b1e7a694589539acb760e4f0
-      internalID: -460258224
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Banana idle_8
+      name: idle_4
       rect:
         serializedVersion: 2
         x: 0
-        y: 1.333374
-        width: 1066.75
-        height: 1067.6666
+        y: 0.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -279,20 +195,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 131f751ab4a272543b800f96ef10fc65
-      internalID: -1750988969
+      spriteID: 75174dc66389e7a4793311b07891a2f7
+      internalID: 1391512785
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banana idle_9
+      name: idle_5
       rect:
         serializedVersion: 2
-        x: 1066
-        y: 1.333374
-        width: 1066.75
-        height: 1067.6666
+        x: 256
+        y: 0.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -300,20 +216,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c40887415c51f444db22f62aafd56a3a
-      internalID: -431205406
+      spriteID: e67d62bc3393f6e4f85487261df5463e
+      internalID: 924602183
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banana idle_10
+      name: idle_6
       rect:
         serializedVersion: 2
-        x: 2132
-        y: 1.333374
-        width: 1066.75
-        height: 1067.6666
+        x: 512
+        y: 0.5
+        width: 256
+        height: 256.5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -321,8 +237,29 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4770cd5b9145aca4b94f8afafefc4bbb
-      internalID: -211088075
+      spriteID: 9adebdf822d008244a08040630edd18d
+      internalID: -720090208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle_7
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 715506c0a1eed4141b7548f20a2738f4
+      internalID: 839655932
       vertices: []
       indices: 
       edges: []
@@ -338,18 +275,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Banana idle_0: 795332963
-      Banana idle_1: 460589510
-      Banana idle_10: -211088075
-      Banana idle_11: 805678335
-      Banana idle_2: 1964715890
-      Banana idle_3: -107382597
-      Banana idle_4: -1647537305
-      Banana idle_5: 1908067287
-      Banana idle_6: 680652374
-      Banana idle_7: -460258224
-      Banana idle_8: -1750988969
-      Banana idle_9: -431205406
+      idle_0: -1467855651
+      idle_1: 2071347907
+      idle_2: 2109200974
+      idle_3: 1416567275
+      idle_4: 1391512785
+      idle_5: 924602183
+      idle_6: -720090208
+      idle_7: 839655932
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
