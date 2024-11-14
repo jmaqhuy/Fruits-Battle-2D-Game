@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -95,7 +95,175 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: char_shoot_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51cd82d6ea2963f49a613b4e644106c9
+      internalID: 890679572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_1
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c3cde3b4a454714ba1ef76201d92201
+      internalID: -2981806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_2
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 256.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a51a68452915a04c8a77a34bd8ec611
+      internalID: 822208707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_3
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 256.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c3e496479edd1b4ea10c7a7bf53466c
+      internalID: -2054870418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12c8fe4d11dc2f541b569d94c096854b
+      internalID: 1787422229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_5
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60fa7e7089a703e49a48ed2b0d97258e
+      internalID: -1347602341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_6
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7674df8c3cb39794bac20ab94eb46d7c
+      internalID: 1815465843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_shoot_7
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0.5
+        width: 256
+        height: 256.5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ded39c25ece84404b9be7a05eee0aaee
+      internalID: 1815756654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -106,7 +274,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      char_shoot_0: 890679572
+      char_shoot_1: -2981806
+      char_shoot_2: 822208707
+      char_shoot_3: -2054870418
+      char_shoot_4: 1787422229
+      char_shoot_5: -1347602341
+      char_shoot_6: 1815465843
+      char_shoot_7: 1815756654
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

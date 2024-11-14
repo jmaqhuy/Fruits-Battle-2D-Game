@@ -179,7 +179,7 @@ MonoBehaviour:
   m_ScreenY: 0.5
   m_CameraDistance: 10
   m_DeadZoneWidth: 0
-  m_DeadZoneHeight: 0
+  m_DeadZoneHeight: 0.21
   m_DeadZoneDepth: 0
   m_UnlimitedSoftZone: 0
   m_SoftZoneWidth: 0.8
@@ -1368,10 +1368,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 40
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 9.8
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1581,7 +1581,7 @@ Transform:
   m_GameObject: {fileID: 1121490401}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.7000122, z: -10}
+  m_LocalPosition: {x: -138, y: -73.79999, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1790,6 +1790,7 @@ GameObject:
   - component: {fileID: 1308557027}
   - component: {fileID: 1308557026}
   - component: {fileID: 1308557025}
+  - component: {fileID: 1308557030}
   - component: {fileID: 1308557029}
   m_Layer: 5
   m_Name: Character Controller
@@ -1899,6 +1900,22 @@ MonoBehaviour:
   powerImage: {fileID: 873060067}
   powerEffect: {fileID: 1066543495}
   powerButton: {fileID: 2111012438}
+--- !u!114 &1308557030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308557024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6b9ce4b2a7065249b89f4a2bc52647e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speedMovement: 5
+  rb: {fileID: 1115483142}
+  animator: {fileID: 1115483143}
+  Player: {fileID: 1115483141}
 --- !u!1 &1455078402
 GameObject:
   m_ObjectHideFlags: 0
@@ -2361,7 +2378,7 @@ Transform:
   m_GameObject: {fileID: 1823753543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.7000122, z: -10}
+  m_LocalPosition: {x: -138, y: -73.79999, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
