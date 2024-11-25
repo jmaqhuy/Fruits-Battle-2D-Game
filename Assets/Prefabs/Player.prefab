@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9097f9cea1c97ea4eac43eda12b99d7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  username: 
   PlayerName: {fileID: 8100599566151307129}
   isHost: {fileID: 9008648249808447327}
   isReady: {fileID: 3277314729137269344}
@@ -163,8 +164,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 230, y: 230}
+  m_AnchoredPosition: {x: 0, y: 2}
+  m_SizeDelta: {x: 159.4859, y: 151.8299}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &6210581199010187147
 CanvasRenderer:
@@ -361,8 +362,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
