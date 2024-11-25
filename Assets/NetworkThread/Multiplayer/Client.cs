@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Lidgren.Network;
+using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
 using UnityEngine;
 
@@ -101,15 +102,23 @@ namespace NetworkThread.Multiplayer
         private void HandleRoomPacket(PacketTypes.Room type, NetIncomingMessage message)
         {
             Packet packet;
+            WaitingRoomScript scriptNow;
             switch (type)
             {
                 case PacketTypes.Room.JoinRoomPacket:
                     packet = new JoinRoomPacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("Room joined");
-                    var waitingroom = (WaitingRoomScript)_uiScripts;
-                    waitingroom.PasteRoomInfo((JoinRoomPacket)packet);
-                    waitingroom.PasteMyChracterInfo((JoinRoomPacket)packet);
+                    scriptNow = (WaitingRoomScript)_uiScripts;
+                    scriptNow.PasteRoomInfo((JoinRoomPacket)packet);
+                    /*waitingroom.PasteMyChracterInfo((JoinRoomPacket)packet);*/
+                    break;
+                
+                case PacketTypes.Room.JoinRoomPacketToAll:
+                    packet = new JoinRoomPacketToAll();
+                    packet.NetIncomingMessageToPacket(message);
+                    scriptNow = (WaitingRoomScript)_uiScripts;
+                    scriptNow.SetUIForAll((JoinRoomPacketToAll)packet);
                     break;
             }
         }
@@ -304,11 +313,11 @@ namespace NetworkThread.Multiplayer
             NetOutgoingMessage message = client.CreateMessage();
             new JoinRoomPacket()
             {
-                username = _username,
-                roomId = 0,
-                roomMode = selectedRoomMode,
-                roomType = RoomType.None,
-                roomName = ""
+                room = new RoomPacket()
+                {
+                    roomMode = selectedRoomMode,
+                    roomType = RoomType.TwoVsTwo
+                }
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();

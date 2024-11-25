@@ -9,6 +9,7 @@ namespace NetworkThread
     {
         private static NetworkManager _instance;
         public GameObject connectingAnimationBg;
+        [SerializeField] private confirmationWindow myConfirmationWindow;
 
         private bool IsConnecting = false;
         
@@ -30,6 +31,8 @@ namespace NetworkThread
             _instance = this;
             
             DontDestroyOnLoad(gameObject);
+            myConfirmationWindow.yesButton.onClick.AddListener(Application.Quit);
+            myConfirmationWindow.noButton.onClick.AddListener(ShowConfirmationWindow);
             NetworkStaticManager.InitializeGameManager();
         }
 
@@ -46,6 +49,10 @@ namespace NetworkThread
             {
                 connectingAnimationBg.gameObject.SetActive(false);
                 IsConnecting = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowConfirmationWindow();
             }
         }
 
@@ -73,7 +80,10 @@ namespace NetworkThread
             Debug.Log("Game manager quit successfully.");
         }
 
-        
+        private void ShowConfirmationWindow()
+        {
+            myConfirmationWindow.gameObject.SetActive(!myConfirmationWindow.gameObject.activeSelf);
+        }
     }
 }
 

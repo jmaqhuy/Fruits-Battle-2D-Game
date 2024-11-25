@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NetworkThread;
 using NetworkThread.Multiplayer;
+using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,40 +25,31 @@ public class WaitingRoomScript : MonoBehaviour
     public GameObject Player2;
     public GameObject Player3;
     public GameObject Player4;
-    private List<GameObject> player1List = new List<GameObject>();
     
     [Header("Team 2")]
     public GameObject Player5;
     public GameObject Player6;
     public GameObject Player7;
     public GameObject Player8;
-    private List<GameObject> player2List = new List<GameObject>();
+    private List<GameObject> playerList = new List<GameObject>();
     
     private GameObject _Me;
 
     void Awake()
     {
-        player1List.Add(Player1);
-        player1List.Add(Player2);
-        player1List.Add(Player3);
-        player1List.Add(Player4);
-        player2List.Add(Player5);
-        player2List.Add(Player6);
-        player2List.Add(Player7);
-        player2List.Add(Player8);
+        playerList.Add(Player1);
+        playerList.Add(Player2);
+        playerList.Add(Player3);
+        playerList.Add(Player4);
+        playerList.Add(Player5);
+        playerList.Add(Player6);
+        playerList.Add(Player7);
+        playerList.Add(Player8);
         
-        foreach (var player in player1List)
+        foreach (var player in playerList)
         {
             player.SetActive(false);
         }
-
-        foreach (var player in player2List)
-        {
-            player.SetActive(false);
-        }
-        
-        
-        
     }
     void Start()
     {
@@ -85,11 +77,11 @@ public class WaitingRoomScript : MonoBehaviour
 
     public void PasteRoomInfo(JoinRoomPacket packet)
     {
-        _intRoomId = packet.roomId;
+        _intRoomId = packet.room.Id;
         SetRoomID(_intRoomId + "");
-        SetRoomName(packet.roomName);
-        roomModeUI.SetBannerRoomMode(packet.roomMode);
-        SetRoomType(packet.roomType);
+        SetRoomName(packet.room.Name);
+        roomModeUI.SetBannerRoomMode(packet.room.roomMode);
+        SetRoomType(packet.room.roomType);
         
     }
 
@@ -109,7 +101,7 @@ public class WaitingRoomScript : MonoBehaviour
         }
     }
 
-    public void PasteMyChracterInfo(JoinRoomPacket packet)
+    /*public void PasteMyChracterInfo(JoinRoomPacket packet)
     {
         if (packet.team == Team.Team1)
         {
@@ -130,5 +122,34 @@ public class WaitingRoomScript : MonoBehaviour
     {
         player.PlayerName.text = packet.displayName;
         player.isHost.SetActive(packet.isHost);
+    }*/
+    public void SetUIForAll(JoinRoomPacketToAll packet)
+    {
+        HideAllPlayers(playerList);
+        
+        foreach (var player in packet.Players)
+        {
+            Debug.Log($"Player Team: {player.team}, Player Position: {player.Position}");
+            playerList[player.Position - 1 ].SetActive(true);
+            SetPlayerDetails(playerList[player.Position - 1].GetComponent<PlayerInWaitingRoom>(), player);
+            
+        }
+    }
+
+    private void HideAllPlayers(List<GameObject> playerList)
+    {
+        foreach (var player in playerList)
+        {
+            player.SetActive(false);
+        }
+    }
+
+    private void SetPlayerDetails(PlayerInWaitingRoom ui, PlayerInRoomPacket data)
+    {
+        ui.username = data.username;
+        if(ui.username == NetworkStaticManager.ClientHandle.GetUsername()) ui.PlayerName.color = Color.yellow;
+        ui.isHost.SetActive(data.isHost);
+        ui.PlayerName.text = data.displayname;
+        ui.isReady.SetActive(data.isReady);
     }
 }

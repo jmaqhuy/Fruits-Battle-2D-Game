@@ -1,3 +1,5 @@
+using Lidgren.Network;
+
 namespace RoomEnum
 {
     public enum RoomMode
@@ -25,6 +27,8 @@ namespace RoomEnum
     {
         Team1, Team2
     }
+    
+    
 
     public static class RoomModeTransfer
     {
