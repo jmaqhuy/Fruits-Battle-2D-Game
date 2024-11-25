@@ -1,5 +1,6 @@
 ﻿using System;
 using Lidgren.Network;
+using RoomEnum;
 using UnityEngine;
 
 namespace NetworkThread.Multiplayer
@@ -8,16 +9,23 @@ namespace NetworkThread.Multiplayer
     {
         public enum General : byte
         {
-            Login,
+            Login = 0,
             SignUp,
             PlayerDisconnectsPacket,
-            BasicUserInfoPacket
+            BasicUserInfoPacket,
+            ChangeDisplayNamePacket
         }
 
         public enum Shop : byte
         {
-            LoadShopPacket,
+            LoadShopPacket = 10,
             RequestBuyPacket,
+        }
+        
+        public enum Room : byte
+        {
+            JoinRoomPacket = 20,
+            ExitRoomPacket,
         }
 
         
@@ -123,6 +131,91 @@ namespace NetworkThread.Multiplayer
             message.Write(coin);
             message.Write(displayName);
             Debug.Log($"PacketToNetOutGoingMessage: username: {userName}, coin: {coin}, displayName {displayName}");
+        }
+    }
+    
+    public class ChangeDisplayNamePacket : Packet
+    {
+        public string username { get; set; }
+        public string newDisplayName { get; set; }
+        public string error {  get; set; }
+        
+        public bool Ok { get; set; }
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            username = message.ReadString();
+            newDisplayName = message.ReadString();
+            error = message.ReadString();
+            Ok = message.ReadBoolean();
+            Debug.Log($"NetIncomingMessageToPacket: username: {username}, newDisplayName: {newDisplayName}, error: {error}");
+        }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.General.ChangeDisplayNamePacket);
+            message.Write(username);
+            message.Write(newDisplayName);
+            message.Write(error);
+            message.Write(Ok);
+            Debug.Log($"PacketToNetOutGoingMessage: username: {username}, newDisplayName: {newDisplayName}, error: {error}");
+        }
+    }
+    
+    public class JoinRoomPacket : Packet
+    {
+        public string username { get; set; }
+        public string displayName { get; set; }
+        public Team team { get; set; }
+        public bool isHost { get; set; }
+        public int position { get; set; }
+        public int roomId { get; set; }
+        public string roomName { get; set; }
+        public RoomMode roomMode { get; set; }
+        public RoomType roomType { get; set; }
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            username = message.ReadString();
+            displayName = message.ReadString();
+            team = (Team)message.ReadByte();
+            isHost = message.ReadBoolean();
+            position = message.ReadInt32();
+            roomId = message.ReadInt32();
+            roomName = message.ReadString();
+            roomMode = (RoomMode)message.ReadByte();
+            roomType = (RoomType)message.ReadByte();
+        }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.JoinRoomPacket);
+            message.Write(username);
+            message.Write(displayName);
+            message.Write((byte)team);
+            message.Write(isHost);
+            message.Write(position);
+            message.Write(roomId);
+            message.Write(roomName);
+            message.Write((byte)roomMode);
+            message.Write((byte)roomType);
+        }
+    }
+
+    public class ExitRoomPacket : Packet
+    {
+        public string username { get; set; }
+        public int roomId { get; set; }
+        
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.ExitRoomPacket);
+            message.Write(username);
+            message.Write(roomId);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            username = message.ReadString();
+            roomId = message.ReadInt32();
         }
     }
 }

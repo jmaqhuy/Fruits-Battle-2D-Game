@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class PlayerInWaitingRoom : MonoBehaviour
 {
+    private string username;
     public TextMeshProUGUI PlayerName;
     public GameObject isHost;
     public GameObject isReady;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NetworkThread;
@@ -12,16 +13,35 @@ public class MainMenu : MonoBehaviour
     public TMP_Text coins;
 
     public TMP_Text displayNameProfile;
+
+    public GameObject changeDisplayNamePanel;
     // Start is called before the first frame update
+
+    void Awake()
+    {
+        NetworkStaticManager.ClientHandle.SetUiScripts(this);
+        Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
+    }
+    
     void Start()
     {
+        NetworkStaticManager.ClientHandle.GetScriptNameNow();
         NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        /*if (firstTime)
+        {
+            firstTime = false;
+            NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
+            if (NetworkStaticManager.ClientHandle.GetUsername() == "")
+            {
+                ShowChangeDisplayNamePanel();
+            }
+        }*/
     }
 
     public void SetDisplayNameTMP(string displayName)
@@ -47,5 +67,20 @@ public class MainMenu : MonoBehaviour
     public void ShowMyProfile()
     {
         displayNameProfile.text = displayName.text;
+    }
+
+    public void ShowChangeDisplayNamePanel()
+    {
+        changeDisplayNamePanel.SetActive(true);
+    }
+
+    public void HideChangeDisplayNamePanel()
+    {
+        changeDisplayNamePanel.SetActive(false);
+    }
+
+    public GameObject GetChangeDisplayNamePanel()
+    {
+        return changeDisplayNamePanel;
     }
 }

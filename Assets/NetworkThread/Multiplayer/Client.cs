@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Lidgren.Network;
+using RoomEnum;
 using UnityEngine;
 
 namespace NetworkThread.Multiplayer
@@ -13,6 +14,7 @@ namespace NetworkThread.Multiplayer
         private MonoBehaviour _uiScripts;
         private string _username = "";
         public bool loadBasicUserInfo { get; set; } = false;
+        public RoomMode RoomMode;
         
         
         public Client()
@@ -25,7 +27,6 @@ namespace NetworkThread.Multiplayer
             client = new NetClient(config);
             client.Start();
             client.RegisterReceivedCallback(ReceiveMessage);
-            
         }
 
         public void ReceiveMessage(object peer)
@@ -52,6 +53,10 @@ namespace NetworkThread.Multiplayer
                         else if (Enum.IsDefined (typeof(PacketTypes.Shop), type))
                         {
                             HandleShopPacket((PacketTypes.Shop)type, message);
+                        } 
+                        else if (Enum.IsDefined (typeof(PacketTypes.Room), type))
+                        {
+                            HandleRoomPacket((PacketTypes.Room)type, message);
                         }
                         else
                         {
@@ -93,6 +98,22 @@ namespace NetworkThread.Multiplayer
             }
         }
 
+        private void HandleRoomPacket(PacketTypes.Room type, NetIncomingMessage message)
+        {
+            Packet packet;
+            switch (type)
+            {
+                case PacketTypes.Room.JoinRoomPacket:
+                    packet = new JoinRoomPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Room joined");
+                    var waitingroom = (WaitingRoomScript)_uiScripts;
+                    waitingroom.PasteRoomInfo((JoinRoomPacket)packet);
+                    waitingroom.PasteMyChracterInfo((JoinRoomPacket)packet);
+                    break;
+            }
+        }
+
         public void DiscoveryServer()
         {
             client.DiscoverLocalPeers(14242);
@@ -128,6 +149,7 @@ namespace NetworkThread.Multiplayer
                     if (((Login)packet).isSuccess)
                     {
                         loginManager.LoginSuccess();
+                        _username = ((Login)packet).username;
                     }
                     else
                     {
@@ -159,10 +181,31 @@ namespace NetworkThread.Multiplayer
                     Debug.Log("Type: Received BasicUserInfo Packet");
                     packet = new BasicUserInfoPacket();
                     packet.NetIncomingMessageToPacket(message);
+                    
                     var mainMenuScript = (MainMenu)_uiScripts;
                     mainMenuScript.SetDisplayNameTMP(((BasicUserInfoPacket)packet).displayName);
                     mainMenuScript.SetCoinsTMP(((BasicUserInfoPacket)packet).coin);
                     loadBasicUserInfo = true;
+                    
+                    if ( string.IsNullOrEmpty(((BasicUserInfoPacket)packet).displayName) )
+                    {
+                        mainMenuScript.ShowChangeDisplayNamePanel();
+                    }
+                    else
+                    {
+                        mainMenuScript.HideChangeDisplayNamePanel();
+                    }
+                    break;
+                
+                case PacketTypes.General.ChangeDisplayNamePacket:
+                    Debug.Log("Type: Received ChangeDisplayName Packet");
+                    packet = new ChangeDisplayNamePacket();
+                    packet.NetIncomingMessageToPacket(message);
+
+                    if (((ChangeDisplayNamePacket)packet).Ok)
+                    {
+                        RequestBasicUserInfo();
+                    }
                     break;
                 
                 default:
@@ -241,9 +284,57 @@ namespace NetworkThread.Multiplayer
             
         }
 
+        public void SendChangeDisplayNamePacket(string newDisplayName)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new ChangeDisplayNamePacket()
+            {
+                username = _username,
+                newDisplayName = newDisplayName,
+                error = "",
+                Ok = false
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            Debug.Log("Sending Sign Up package to server");
+        }
+
+        public void SendJoinRoomPacket(RoomMode selectedRoomMode)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new JoinRoomPacket()
+            {
+                username = _username,
+                roomId = 0,
+                roomMode = selectedRoomMode,
+                roomType = RoomType.None,
+                roomName = ""
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        
+        public void SendExitRoomPacket(int roomId)
+        {
+            Debug.Log("Sending Exit Room Packet to server");
+            NetOutgoingMessage message = client.CreateMessage();
+            new ExitRoomPacket()
+            {
+                username = _username,
+                roomId = roomId
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
         public bool IsConnected()
         {
             return connected;
+        }
+
+        public string GetUsername()
+        {
+            return _username;
         }
 
         public void SetUiScripts(MonoBehaviour uiScripts)
@@ -267,5 +358,7 @@ namespace NetworkThread.Multiplayer
             }
         }
 
+
+        
     }
 }

@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerName: {fileID: 8100599566151307129}
-  isHost: {fileID: 0}
+  isHost: {fileID: 9008648249808447327}
   isReady: {fileID: 3277314729137269344}
   character: {fileID: 4709780959324370561}
 --- !u!1 &3277314729137269344

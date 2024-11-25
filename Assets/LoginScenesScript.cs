@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using NetworkThread;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,12 +24,45 @@ public class LoginScenesScript : MonoBehaviour
     public GameObject signUpPanel;
     public GameObject loginPanel;
     
+    [Header("Processing ...")]
+    public GameObject loadingPanel;
+    public TextMeshProUGUI loadingText;
+
+    private void Awake()
+    {
+        Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
+        loginButton.onClick.AddListener(OnLoginButtonClicked);
+        signUpButton.onClick.AddListener(OnClickSignUpButton);
+        DontHaveAccountButton.onClick.AddListener(OnDontHaveAccountButtonClicked);
+        HaveAlreadyAccountButton.onClick.AddListener(OnClickHaveAlreadyAccountButton);
+    }
+
     void Start()
     {
-        loginButton.onClick.AddListener(OnLoginButtonClicked);
-        DontHaveAccountButton.onClick.AddListener(OnDontHaveAccountButtonClicked);
-        signUpButton.onClick.AddListener(OnClickSignUpButton);
-        HaveAlreadyAccountButton.onClick.AddListener(OnClickHaveAlreadyAccountButton);
+        NetworkStaticManager.ClientHandle.SetUiScripts(this);
+        NetworkStaticManager.ClientHandle.GetScriptNameNow();
+    }
+    
+    public void OnLoginButtonClicked()
+    {
+        ShowProcessPanel("Login");
+        
+        var username = usernameText_login.text;
+        var password = passwordText_login.text;
+        errorText_login.text = "";
+        //string username = "testUser";
+        //string password = "password123";
+
+        if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+        {
+            NetworkStaticManager.ClientHandle.SendLoginPackage(username, password);
+            errorText_login.text = $"Login request sent for user: {username}";
+        }
+        else
+        {
+            errorText_login.text = "Username or password is empty.";
+            HideProcessPanel();
+        }
     }
 
     private void OnClickHaveAlreadyAccountButton()
@@ -50,26 +82,22 @@ public class LoginScenesScript : MonoBehaviour
         errorText_login.text = string.Empty;
     }
 
-    void OnLoginButtonClicked()
-    {
-        errorText_login.text = "";
-        string username = usernameText_login.text;
-        string password = passwordText_login.text;
-        //string username = "testUser";
-        //string password = "password123";
+    
 
-        if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
-        {
-            NetworkStaticManager.ClientHandle.SendLoginPackage(username, password);
-            Debug.Log($"Login request sent for user: {username}");
-        }
-        else
-        {
-            Debug.Log("Username or password is empty.");
-        }
-    }
-    private void OnClickSignUpButton()
+    private void ShowProcessPanel(string content)
     {
+        loadingText.text = content;
+        loadingPanel.SetActive(true);
+    }
+
+    private void HideProcessPanel()
+    {
+        loadingPanel.SetActive(false);
+    }
+    
+    public void OnClickSignUpButton()
+    {
+        ShowProcessPanel("Sign Up");
         errorText_signUp.text = "";
         string username = usernameText_signUp.text;
         string password = passwordText_signUp.text;
@@ -78,18 +106,22 @@ public class LoginScenesScript : MonoBehaviour
         if (string.IsNullOrEmpty(username))
         {
             errorText_signUp.text = "Username is required";
+            HideProcessPanel();
         } 
         else if (string.IsNullOrEmpty(password))
         {
             errorText_signUp.text = "Password is required";
+            HideProcessPanel();
         } 
         else if (string.IsNullOrEmpty(retype))
         {
             errorText_signUp.text = "Retype is required";
+            HideProcessPanel();
         } 
         else if (password != retype)
         {
             errorText_signUp.text = "Passwords do not match";
+            HideProcessPanel();
         }
         else
         {
@@ -100,21 +132,25 @@ public class LoginScenesScript : MonoBehaviour
     
     public void LoginSuccess()
     {
+        HideProcessPanel();
         SceneManager.LoadScene("Main Menu");
     }
 
     public void LoginFail()
     {
+        HideProcessPanel();
         errorText_login.text = "Login failed!";
     }
     
     public void SignUpFail(string error)
     {
+        HideProcessPanel();
         errorText_signUp.text = error;
     }
 
     public void SignUpSuccess()
     {
+        HideProcessPanel();
         StartCoroutine(CountdownToLogin(3));
     }
     

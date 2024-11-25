@@ -9,48 +9,28 @@ namespace NetworkThread
     {
         private static NetworkManager _instance;
         public GameObject connectingAnimationBg;
-        //public LoginScenesScript loginScenesScript;
-        //public MainMenu mainMenuScript;
+
         private bool IsConnecting = false;
-        //private List<MonoBehaviour> uiScripts = new List<MonoBehaviour>();
-        private string _currentScene;
-        private MonoBehaviour _currentUIScript;
+        
         private GameObject _mainCamera;
 
 
         private void Awake()
         {
-            _currentScene = SceneManager.GetActiveScene().name;
-            _mainCamera = GameObject.Find("Main Camera");
-            if (_currentScene == "Login")
-            {
-                _currentUIScript = _mainCamera.GetComponent<LoginScenesScript>();
-            } else if (_currentScene == "Main Menu")
-            {
-                _currentUIScript = _mainCamera.GetComponent<MainMenu>();
-            }
-            Debug.Log($"Scene {_currentScene}");
-            //getScriptNow();
             
             if (_instance != null)
             {   
                 Debug.Log("NetworkManager instance already exists!");
-                NetworkStaticManager.ClientHandle.SetUiScripts(_currentUIScript);
-                NetworkStaticManager.ClientHandle.GetScriptNameNow();
+                
                 Destroy(gameObject);
                 return;
             }
             
-            //uiScripts.Add(loginScenesScript);
-            //uiScripts.Add(mainMenuScript);
             Debug.Log("Instantiating NetworkManager!");
             _instance = this;
             
             DontDestroyOnLoad(gameObject);
             NetworkStaticManager.InitializeGameManager();
-            NetworkStaticManager.ClientHandle.SetUiScripts(_currentUIScript);
-            NetworkStaticManager.ClientHandle.GetScriptNameNow();
-            
         }
 
         void Update()
@@ -77,7 +57,7 @@ namespace NetworkThread
                 
                 Debug.Log($"Starting discovery: {time}");
                 NetworkStaticManager.ClientHandle.DiscoveryServer();
-                yield return new WaitForSeconds(5f);
+                yield return new WaitForSeconds(3f);
                 time++;
             }
         }

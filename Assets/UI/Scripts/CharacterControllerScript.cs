@@ -1,6 +1,7 @@
 using System;
 using Code_Battle_System.BatlleSystem;
 using Code_Battle_System.Character;
+using NetworkThread;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,6 +49,11 @@ namespace UI.Scripts
         public Image manaFill;
         public float speedOfMana = 1f;
         private bool controllerWarking = true;
+
+        /*void Awake()
+        {
+            NetworkStaticManager.ClientHandle.SetUiScripts(this);
+        }*/
         
         //Setup Player before battle start.
         void Start()
