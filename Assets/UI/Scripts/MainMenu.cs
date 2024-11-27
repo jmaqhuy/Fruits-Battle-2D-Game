@@ -64,6 +64,11 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("Select Play Mode");
     }
 
+    public void GoToFriends()
+    {
+        SceneManager.LoadScene("Friends");
+    }
+
     public void ShowMyProfile()
     {
         displayNameProfile.text = displayName.text;

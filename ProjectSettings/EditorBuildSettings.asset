@@ -8,9 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Login.unity
     guid: 67abe880c9e573844938fbc253de4d6f
+  - enabled: 0
+    path: Assets/Scenes/Start Game Screen.unity
+    guid: 13f4480228d5ed343ab0bb59d481a1a7
   - enabled: 1
     path: Assets/Scenes/Main Menu.unity
     guid: bc747ab5227f9e2468f4147fd5af471a
+  - enabled: 1
+    path: Assets/Scenes/Friends.unity
+    guid: 0556878abb3f6b04ab50603482fdf90c
   - enabled: 1
     path: Assets/Scenes/Shop.unity
     guid: 3317a31f86b431e468f83d61b85f03bb
@@ -23,7 +29,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Maps/Normal Mode Map.unity
     guid: 463306cd54b6e4842a00067a54107408
-  - enabled: 1
-    path: Assets/Scenes/Start Game Screen.unity
-    guid: 13f4480228d5ed343ab0bb59d481a1a7
   m_configObjects: {}

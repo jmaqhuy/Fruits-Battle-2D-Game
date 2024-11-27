@@ -29,7 +29,13 @@ namespace NetworkThread.Multiplayer
             JoinRoomPacket = 20,
             JoinRoomPacketToAll,
             ExitRoomPacket,
+            InviteFriendPacket,
             
+        }
+
+        public enum Friend : byte
+        {
+            FriendOnlinePacket = 30,
         }
 
         
@@ -46,6 +52,52 @@ namespace NetworkThread.Multiplayer
         public abstract void PacketToNetOutGoingMessage(NetOutgoingMessage message);
 
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
+    }
+
+    /*public class FriendOnlinePacket : Packet
+    {
+        public string username;
+        public string displayName;
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Friend.FriendOnlinePacket);
+            message.Write(username);
+            message.Write(displayName);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            username = message.ReadString();
+            displayName = message.ReadString();
+        }
+    }*/
+
+    public class InviteFriendPacket : Packet
+    {
+        public string username;
+        public string displayName;
+        public RoomPacket room;
+        public string friendUserName;
+        public string friendDisplayName;
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.InviteFriendPacket);
+            message.Write(username);
+            message.Write(displayName);
+            room.Serialize(message);
+            message.Write(friendUserName);
+            message.Write(friendDisplayName);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            username = message.ReadString();
+            displayName = message.ReadString();
+            room = RoomPacket.Deserialize(message);
+            friendUserName = message.ReadString();
+            friendDisplayName = message.ReadString();
+        }
     }
 
     public class Login : Packet

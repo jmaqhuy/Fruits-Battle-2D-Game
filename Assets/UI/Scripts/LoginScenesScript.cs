@@ -27,9 +27,14 @@ public class LoginScenesScript : MonoBehaviour
     [Header("Processing ...")]
     public GameObject loadingPanel;
     public TextMeshProUGUI loadingText;
+    
+    private string _usernameInPrefs;
+    private string _passwordInPrefs;
 
     private void Awake()
     {
+        _usernameInPrefs = PlayerPrefs.GetString("Username", string.Empty);
+        _passwordInPrefs = PlayerPrefs.GetString("Password", string.Empty);
         Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
         loginButton.onClick.AddListener(OnLoginButtonClicked);
         signUpButton.onClick.AddListener(OnClickSignUpButton);
@@ -41,6 +46,7 @@ public class LoginScenesScript : MonoBehaviour
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         NetworkStaticManager.ClientHandle.GetScriptNameNow();
+        
     }
     
     public void OnLoginButtonClicked()
@@ -50,9 +56,8 @@ public class LoginScenesScript : MonoBehaviour
         var username = usernameText_login.text;
         var password = passwordText_login.text;
         errorText_login.text = "";
-        //string username = "testUser";
-        //string password = "password123";
-
+        PlayerPrefs.SetString("Username", username);
+        PlayerPrefs.SetString("Password", password);
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
             NetworkStaticManager.ClientHandle.SendLoginPackage(username, password);
@@ -62,6 +67,14 @@ public class LoginScenesScript : MonoBehaviour
         {
             errorText_login.text = "Username or password is empty.";
             HideProcessPanel();
+        }
+    }
+
+    public void LoginUsingPlayerPrefs()
+    {
+        if (!string.IsNullOrEmpty(_usernameInPrefs) && !string.IsNullOrEmpty(_passwordInPrefs))
+        {
+            NetworkStaticManager.ClientHandle.SendLoginPackage(_usernameInPrefs, _passwordInPrefs);
         }
     }
 
@@ -138,8 +151,18 @@ public class LoginScenesScript : MonoBehaviour
 
     public void LoginFail()
     {
-        HideProcessPanel();
-        errorText_login.text = "Login failed!";
+        
+        if (!string.IsNullOrEmpty(_usernameInPrefs))
+        {
+            PlayerPrefs.DeleteKey("Username");
+            PlayerPrefs.DeleteKey("Password");
+        }
+        else
+        {
+            HideProcessPanel();
+            errorText_login.text = "Login failed!";
+        }
+        
     }
     
     public void SignUpFail(string error)

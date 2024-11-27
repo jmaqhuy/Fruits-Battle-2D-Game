@@ -30,7 +30,7 @@ MonoBehaviour:
     value: {r: 0.9811321, g: 0.92961466, b: 0.31933072, a: 1}
   - color: 7
     value: {r: 1, g: 0.6233778, b: 0.30588233, a: 1}
-  OverlayColor: {r: 0, g: 0, b: 0, a: 0.0627451}
-  BackgroundColor: {r: 0.12882696, g: 0.13386832, b: 0.14150941, a: 1}
+  OverlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  BackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   TitleTextColor: {r: 1, g: 1, b: 1, a: 1}
   DetailsTextColor: {r: 1, g: 1, b: 1, a: 0.59607846}

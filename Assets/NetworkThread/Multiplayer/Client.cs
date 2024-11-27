@@ -5,6 +5,7 @@ using Lidgren.Network;
 using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
 using UnityEngine;
+using Object = System.Object;
 
 namespace NetworkThread.Multiplayer
 {
@@ -13,6 +14,7 @@ namespace NetworkThread.Multiplayer
         public NetClient client { get; set; }
         private bool connected = false;
         private MonoBehaviour _uiScripts;
+        private MonoBehaviour _invitePopupScripts;
         private string _username = "";
         public bool loadBasicUserInfo { get; set; } = false;
         public RoomMode RoomMode;
@@ -20,7 +22,7 @@ namespace NetworkThread.Multiplayer
         
         public Client()
         {
-            var config = new NetPeerConfiguration("game")
+            var config = new NetPeerConfiguration("FruitsBattle2DGame")
             {
                 AutoFlushSendQueue = false
             };
@@ -59,6 +61,11 @@ namespace NetworkThread.Multiplayer
                         {
                             HandleRoomPacket((PacketTypes.Room)type, message);
                         }
+                        /*else if (Enum.IsDefined(typeof(PacketTypes.Friend), type))
+                        {
+                            HandleFriendPacket((PacketTypes.Friend)type, message);
+                        }*/
+                        
                         else
                         {
                             Debug.Log("Unhandled message type");
@@ -70,6 +77,7 @@ namespace NetworkThread.Multiplayer
                         {
                             Debug.Log("Connected to server");
                             connected = true;
+                            ((LoginScenesScript)_uiScripts).LoginUsingPlayerPrefs();
                         }
                         else if (message.SenderConnection.Status == NetConnectionStatus.Disconnected)
                         {
@@ -99,6 +107,30 @@ namespace NetworkThread.Multiplayer
             }
         }
 
+        /*private void HandleFriendPacket(PacketTypes.Friend type, NetIncomingMessage message)
+        {
+            Packet packet;
+            switch (type)
+            {
+                case PacketTypes.Friend.FriendOnlinePacket:
+                    packet = new FriendOnlinePacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Friend Online");
+                    try
+                    {
+                        var friendPanel = GameObject.Find("FriendOnline");
+                        FriendOnlineStatus friendOnlineStatus = friendPanel.GetComponent<FriendOnlineStatus>();
+                        friendOnlineStatus.friendName.text = ((FriendOnlinePacket)packet).displayName;
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+
+                    break;
+            }
+        }*/
+
         private void HandleRoomPacket(PacketTypes.Room type, NetIncomingMessage message)
         {
             Packet packet;
@@ -120,7 +152,24 @@ namespace NetworkThread.Multiplayer
                     scriptNow = (WaitingRoomScript)_uiScripts;
                     scriptNow.SetUIForAll((JoinRoomPacketToAll)packet);
                     break;
+                
+                case PacketTypes.Room.InviteFriendPacket:
+                    packet = new InviteFriendPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    ((FriendInviteUI)_invitePopupScripts).FriendName.text = ((InviteFriendPacket)packet).friendDisplayName;
+                    ((FriendInviteUI)_invitePopupScripts).roomPacket = ((InviteFriendPacket)packet).room;
+                    var modeAndRoomType = ((InviteFriendPacket)packet).room.roomMode + " " +
+                                          ((InviteFriendPacket)packet).room.roomType;
+                    
+                    ((FriendInviteUI)_invitePopupScripts).ModeandRoomType.text = modeAndRoomType;
+                    ((FriendInviteUI)_invitePopupScripts).ShowInvite();
+                    break;
             }
+        }
+
+        public void SetInvitePopupScripts(FriendInviteUI script)
+        {
+            _invitePopupScripts = script;
         }
 
         public void DiscoveryServer()
