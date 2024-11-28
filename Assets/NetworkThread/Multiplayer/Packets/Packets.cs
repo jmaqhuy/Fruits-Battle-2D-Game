@@ -31,6 +31,7 @@ namespace NetworkThread.Multiplayer
             JoinRoomPacketToAll,
             ExitRoomPacket,
             InviteFriendPacket,
+            SendChatMessagePacket
             
         }
 
@@ -54,6 +55,32 @@ namespace NetworkThread.Multiplayer
 
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
     }
+
+    public class SendChatMessagePacket : Packet
+    {
+        public string Username { get; set; }
+        public string DisplayName { get; set; }
+        public int RoomID { get; set; }
+        public string Message { get; set; }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.SendChatMessagePacket);
+            message.Write(Username);
+            message.Write(DisplayName);
+            message.Write(RoomID);
+            message.Write(Message);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            Username = message.ReadString();
+            DisplayName = message.ReadString();
+            RoomID = message.ReadInt32();
+            Message = message.ReadString();
+        }
+    }
+    
+    
 
     /*public class FriendOnlinePacket : Packet
     {

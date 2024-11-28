@@ -74,17 +74,6 @@ namespace NetworkThread.Multiplayer
                         {
                             Debug.Log("Connected to server");
                             connected = true;
-                            try
-                            {
-                                
-                                ((LoginScenesScript)_uiScripts).LoginUsingPlayerPrefs();
-                                Debug.Log("Login Using PlayerPrefs");
-                                
-                            }
-                            catch
-                            {
-                                //
-                            }
                             
                         }
                         else if (message.SenderConnection.Status == NetConnectionStatus.Disconnected)
@@ -172,7 +161,32 @@ namespace NetworkThread.Multiplayer
                     ((FriendInviteUI)_invitePopupScripts).ModeandRoomType.text = modeAndRoomType;
                     ((FriendInviteUI)_invitePopupScripts).ShowInvite();
                     break;
+                case PacketTypes.Room.SendChatMessagePacket:
+                    packet = new SendChatMessagePacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    scriptNow = (WaitingRoomScript)_uiScripts;
+                    scriptNow.ReceiveChatMessage(
+                        ((SendChatMessagePacket)packet).Username,
+                        ((SendChatMessagePacket)packet).DisplayName,
+                        ((SendChatMessagePacket)packet).Message);
+                    break;
+                    
             }
+        }
+
+        public void SendChatMessagePacket(string message, int roomId)
+        {
+            NetOutgoingMessage msg = client.CreateMessage();
+            new SendChatMessagePacket()
+            {
+                Username = _username,
+                Message = message,
+                RoomID = roomId
+            }.PacketToNetOutGoingMessage(msg);
+            Debug.Log($"Sending Chat Message: Username: {_username}, Room ID: {roomId}, message: {message}");
+            client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            
         }
 
         public void SetInvitePopupScripts(FriendInviteUI script)

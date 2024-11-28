@@ -38,16 +38,9 @@ public class LoginScenesScript : MonoBehaviour
     [Header("Processing Parameters")]
     public GameObject processingAnimation;
     public TextMeshProUGUI loadingText;
-    
-    
-    private string _usernameInPrefs;
-    private string _passwordInPrefs;
-    private bool _loginUsingPrefs = false;
 
     private void Awake()
     {
-        _usernameInPrefs = PlayerPrefs.GetString("Username", string.Empty);
-        _passwordInPrefs = PlayerPrefs.GetString("Password", string.Empty);
         Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
         RegisterButtonClicked();
         
@@ -57,8 +50,6 @@ public class LoginScenesScript : MonoBehaviour
     {
         ShowLoginPanel();
         NetworkStaticManager.ClientHandle.SendLogoutPacket();
-        PlayerPrefs.DeleteKey("Username");
-        PlayerPrefs.DeleteKey("Password");
         usernameText_login.text = "";
         passwordText_login.text = "";
         errorText_login.text = "";
@@ -81,8 +72,6 @@ public class LoginScenesScript : MonoBehaviour
         var username = usernameText_login.text;
         var password = passwordText_login.text;
         errorText_login.text = "";
-        PlayerPrefs.SetString("Username", username);
-        PlayerPrefs.SetString("Password", password);
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
             ShowLoadingPanel("Login");
@@ -91,20 +80,6 @@ public class LoginScenesScript : MonoBehaviour
         else
         {
             ShowLoginPanel("Username or password is empty.");
-        }
-    }
-
-    public void LoginUsingPlayerPrefs()
-    {
-        if (!string.IsNullOrEmpty(_usernameInPrefs) && !string.IsNullOrEmpty(_passwordInPrefs))
-        {
-            ShowLoadingPanel("Login");
-            NetworkStaticManager.ClientHandle.SendLoginPackage(_usernameInPrefs, _passwordInPrefs);
-            _loginUsingPrefs = true;
-        }
-        else
-        {
-            ShowLoginPanel();
         }
     }
 
@@ -159,13 +134,11 @@ public class LoginScenesScript : MonoBehaviour
     
     public void LoginSuccess()
     {
-        ShowSuccessPanel(PlayerPrefs.GetString("Username"));
+        ShowSuccessPanel(NetworkStaticManager.ClientHandle.GetUsername());
     }
 
     public void LoginFail()
     {
-        PlayerPrefs.DeleteKey("Username");
-        PlayerPrefs.DeleteKey("Password");
         ShowLoginPanel("Login failed");
     }
     
@@ -237,8 +210,6 @@ public class LoginScenesScript : MonoBehaviour
 
     public void ShowSuccessPanel(string username)
     {
-        /*var animator = successPanel.GetComponent<Animator>();
-        animator.Play("LoginSuccess");*/
         loadingText.text = "";
         errorText_login.text = "";
         errorText_signUp.text = "";
@@ -247,7 +218,6 @@ public class LoginScenesScript : MonoBehaviour
         signUpPanel.SetActive(false);
         loginPanel.SetActive(false);
         successPanel.SetActive(true);
-        welcomeUserText.text = $"Welcome back, {PlayerPrefs.GetString("Username")}!";
     }
 
     private void RegisterButtonClicked()

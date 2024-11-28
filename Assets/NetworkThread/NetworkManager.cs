@@ -56,6 +56,7 @@ namespace NetworkThread
             else if (NetworkStaticManager.ClientHandle.IsConnected() && IsConnecting)
             {
                 IsConnecting = false;
+                _loginScenesScript.ShowLoginPanel();
             }
         }
 

@@ -33,6 +33,12 @@ public class WaitingRoomScript : MonoBehaviour
     public GameObject Player8;
     private List<GameObject> playerList = new List<GameObject>();
     
+    [Header("ChatZone")]
+    public RectTransform chatPanelZone;
+    public GameObject prefab;
+    public TextMeshProUGUI MsgLastest;
+    public TMP_InputField textBox;
+    
     private GameObject _Me;
 
     void Awake()
@@ -56,7 +62,21 @@ public class WaitingRoomScript : MonoBehaviour
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         NetworkStaticManager.ClientHandle.SendJoinRoomPacket(RoomModeTransfer.RoomMode);
         buttonBack.onClick.AddListener(OnButtonBackClick);
+        
     }
+
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            if (!string.IsNullOrEmpty(textBox.text.Trim()))
+            {
+                
+                SendChatMessage();
+            }
+        }
+    }
+    
 
     void OnButtonBackClick()
     {
@@ -99,6 +119,34 @@ public class WaitingRoomScript : MonoBehaviour
                 roomType.text = "4 Vs 4";
                 break;
         }
+    }
+
+    private void SendChatMessage()
+    {
+        Debug.Log($"Username: {NetworkStaticManager.ClientHandle.GetUsername()}, message: {textBox.text}");
+        NetworkStaticManager.ClientHandle.SendChatMessagePacket(textBox.text, _intRoomId);
+        textBox.text = "";
+        textBox.ActivateInputField();
+    }
+
+    public void ReceiveChatMessage(string username, string displayName, string msg)
+    {
+        GameObject newMessage = Instantiate(prefab, chatPanelZone);
+        TextMeshProUGUI textComponent = newMessage.GetComponent<TextMeshProUGUI>();
+
+        
+        if (string.Equals(username, NetworkStaticManager.ClientHandle.GetUsername()))
+        {
+            Debug.Log("Set message color");
+            textComponent.color = Color.yellow;
+            MsgLastest.color = Color.yellow;
+            
+        }
+        textComponent.text = displayName + ": "+msg;
+        MsgLastest.text = displayName + ": "+msg;
+        Canvas.ForceUpdateCanvases();
+        newMessage.transform.SetAsLastSibling();
+        
     }
 
     /*public void PasteMyChracterInfo(JoinRoomPacket packet)
@@ -152,4 +200,6 @@ public class WaitingRoomScript : MonoBehaviour
         ui.PlayerName.text = data.displayname;
         ui.isReady.SetActive(data.isReady);
     }
+
+    
 }
