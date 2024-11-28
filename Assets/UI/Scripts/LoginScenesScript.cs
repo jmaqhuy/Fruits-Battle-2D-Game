@@ -7,6 +7,12 @@ using UnityEngine.SceneManagement;
 
 public class LoginScenesScript : MonoBehaviour
 {
+    [Header("Panels")]
+    public GameObject signUpPanel;
+    public GameObject loginPanel;
+    public GameObject loadingPanel;
+    public GameObject successPanel;
+    
     [Header("Login Parameters")]
     public TMP_InputField usernameText_login; 
     public TMP_InputField passwordText_login;
@@ -21,38 +27,57 @@ public class LoginScenesScript : MonoBehaviour
     public TextMeshProUGUI errorText_signUp;
     public Button signUpButton;
     public Button HaveAlreadyAccountButton;
-    public GameObject signUpPanel;
-    public GameObject loginPanel;
     
-    [Header("Processing ...")]
-    public GameObject loadingPanel;
+    
+    [Header("LoginSuccess Parameters")]
+    public TextMeshProUGUI welcomeUserText;
+    public Button PlayButton;
+    public Button LogoutButton;
+    
+    
+    [Header("Processing Parameters")]
+    public GameObject processingAnimation;
     public TextMeshProUGUI loadingText;
+    
     
     private string _usernameInPrefs;
     private string _passwordInPrefs;
+    private bool _loginUsingPrefs = false;
 
     private void Awake()
     {
         _usernameInPrefs = PlayerPrefs.GetString("Username", string.Empty);
         _passwordInPrefs = PlayerPrefs.GetString("Password", string.Empty);
         Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
-        loginButton.onClick.AddListener(OnLoginButtonClicked);
-        signUpButton.onClick.AddListener(OnClickSignUpButton);
-        DontHaveAccountButton.onClick.AddListener(OnDontHaveAccountButtonClicked);
-        HaveAlreadyAccountButton.onClick.AddListener(OnClickHaveAlreadyAccountButton);
+        RegisterButtonClicked();
+        
+    }
+
+    private void OnClickLogoutButton()
+    {
+        ShowLoginPanel();
+        NetworkStaticManager.ClientHandle.SendLogoutPacket();
+        PlayerPrefs.DeleteKey("Username");
+        PlayerPrefs.DeleteKey("Password");
+        usernameText_login.text = "";
+        passwordText_login.text = "";
+        errorText_login.text = "";
+        usernameText_signUp.text = "";
+        passwordText_signUp.text = "";
+        errorText_signUp.text = "";
+        
     }
 
     void Start()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         NetworkStaticManager.ClientHandle.GetScriptNameNow();
-        
+        loadingText.text = "";
+        ShowLoadingPanel();
     }
     
     public void OnLoginButtonClicked()
     {
-        ShowProcessPanel("Login");
-        
         var username = usernameText_login.text;
         var password = passwordText_login.text;
         errorText_login.text = "";
@@ -60,13 +85,12 @@ public class LoginScenesScript : MonoBehaviour
         PlayerPrefs.SetString("Password", password);
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
+            ShowLoadingPanel("Login");
             NetworkStaticManager.ClientHandle.SendLoginPackage(username, password);
-            errorText_login.text = $"Login request sent for user: {username}";
         }
         else
         {
-            errorText_login.text = "Username or password is empty.";
-            HideProcessPanel();
+            ShowLoginPanel("Username or password is empty.");
         }
     }
 
@@ -74,7 +98,13 @@ public class LoginScenesScript : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(_usernameInPrefs) && !string.IsNullOrEmpty(_passwordInPrefs))
         {
+            ShowLoadingPanel("Login");
             NetworkStaticManager.ClientHandle.SendLoginPackage(_usernameInPrefs, _passwordInPrefs);
+            _loginUsingPrefs = true;
+        }
+        else
+        {
+            ShowLoginPanel();
         }
     }
 
@@ -85,6 +115,7 @@ public class LoginScenesScript : MonoBehaviour
         passwordText_signUp.text = string.Empty;
         retypePasswordText_signUp.text = string.Empty;
         errorText_signUp.text = string.Empty;
+        ShowLoginPanel();
     }
 
     private void OnDontHaveAccountButtonClicked()
@@ -93,87 +124,58 @@ public class LoginScenesScript : MonoBehaviour
         usernameText_login.text = string.Empty;
         passwordText_login.text = string.Empty;
         errorText_login.text = string.Empty;
-    }
-
-    
-
-    private void ShowProcessPanel(string content)
-    {
-        loadingText.text = content;
-        loadingPanel.SetActive(true);
-    }
-
-    private void HideProcessPanel()
-    {
-        loadingPanel.SetActive(false);
+        ShowSignUpPanel();
     }
     
     public void OnClickSignUpButton()
     {
-        ShowProcessPanel("Sign Up");
-        errorText_signUp.text = "";
         string username = usernameText_signUp.text;
         string password = passwordText_signUp.text;
         string retype = retypePasswordText_signUp.text;
 
         if (string.IsNullOrEmpty(username))
         {
-            errorText_signUp.text = "Username is required";
-            HideProcessPanel();
+            ShowSignUpPanel("Username is required");
         } 
         else if (string.IsNullOrEmpty(password))
         {
-            errorText_signUp.text = "Password is required";
-            HideProcessPanel();
+            ShowSignUpPanel("Password is required");
         } 
         else if (string.IsNullOrEmpty(retype))
         {
-            errorText_signUp.text = "Retype is required";
-            HideProcessPanel();
+            ShowSignUpPanel("Retype Password is required");
         } 
         else if (password != retype)
         {
-            errorText_signUp.text = "Passwords do not match";
-            HideProcessPanel();
+            ShowSignUpPanel("Passwords do not match");
         }
         else
         {
             NetworkStaticManager.ClientHandle.SendSignUpPackage(username,password);
+            ShowLoadingPanel("Sign Up");
             Debug.Log($"Sign Up request sent for user: {username}");
         }
     }
     
     public void LoginSuccess()
     {
-        HideProcessPanel();
-        SceneManager.LoadScene("Main Menu");
+        ShowSuccessPanel(PlayerPrefs.GetString("Username"));
     }
 
     public void LoginFail()
     {
-        
-        if (!string.IsNullOrEmpty(_usernameInPrefs))
-        {
-            PlayerPrefs.DeleteKey("Username");
-            PlayerPrefs.DeleteKey("Password");
-        }
-        else
-        {
-            HideProcessPanel();
-            errorText_login.text = "Login failed!";
-        }
-        
+        PlayerPrefs.DeleteKey("Username");
+        PlayerPrefs.DeleteKey("Password");
+        ShowLoginPanel("Login failed");
     }
     
     public void SignUpFail(string error)
     {
-        HideProcessPanel();
-        errorText_signUp.text = error;
+        ShowSignUpPanel(error);
     }
 
     public void SignUpSuccess()
     {
-        HideProcessPanel();
         StartCoroutine(CountdownToLogin(3));
     }
     
@@ -183,17 +185,83 @@ public class LoginScenesScript : MonoBehaviour
         // Thực hiện đếm ngược
         while (seconds > 0)
         {
-            errorText_signUp.text = $"Sign Up Success! Back to Login in {seconds} seconds.";
+            loadingText.text = $"Sign Up Success! Back to Login in {seconds} seconds.";
             yield return new WaitForSeconds(1);
             seconds--;
         }
+        errorText_signUp.text = string.Empty;
         usernameText_login.text = usernameText_signUp.text;
         usernameText_signUp.text = string.Empty;
         passwordText_signUp.text = string.Empty;
         retypePasswordText_signUp.text = string.Empty;
-        // Sau khi đếm ngược xong, chuyển về màn hình đăng nhập
+        
+        ShowLoginPanel();
+    }
+
+    public void ShowLoadingPanel(string content = "")
+    {
+        loadingText.text = content;
+        errorText_login.text = "";
+        errorText_signUp.text = "";
+        welcomeUserText.text = "";
+        processingAnimation.SetActive(true);
+        loadingPanel.SetActive(true);
+        signUpPanel.SetActive(false);
+        loginPanel.SetActive(false);
+        successPanel.SetActive(false);
+    }
+
+    public void ShowLoginPanel(string loginError = "")
+    {
+        loadingText.text = "";
+        errorText_login.text = loginError;
+        errorText_signUp.text = "";
+        welcomeUserText.text = "";
+        loadingPanel.SetActive(false);
         signUpPanel.SetActive(false);
         loginPanel.SetActive(true);
+        successPanel.SetActive(false);
     }
-    
+
+    public void ShowSignUpPanel(string signupError = "")
+    {
+        loadingText.text = "";
+        errorText_login.text = "";
+        errorText_signUp.text = signupError;
+        welcomeUserText.text = "";
+        loadingPanel.SetActive(false);
+        signUpPanel.SetActive(true);
+        loginPanel.SetActive(false);
+        successPanel.SetActive(false);
+    }
+
+    public void ShowSuccessPanel(string username)
+    {
+        /*var animator = successPanel.GetComponent<Animator>();
+        animator.Play("LoginSuccess");*/
+        loadingText.text = "";
+        errorText_login.text = "";
+        errorText_signUp.text = "";
+        welcomeUserText.text = $"Welcome back, {username}!";
+        loadingPanel.SetActive(false);
+        signUpPanel.SetActive(false);
+        loginPanel.SetActive(false);
+        successPanel.SetActive(true);
+        welcomeUserText.text = $"Welcome back, {PlayerPrefs.GetString("Username")}!";
+    }
+
+    private void RegisterButtonClicked()
+    {
+        loginButton.onClick.AddListener(OnLoginButtonClicked);
+        signUpButton.onClick.AddListener(OnClickSignUpButton);
+        DontHaveAccountButton.onClick.AddListener(OnDontHaveAccountButtonClicked);
+        HaveAlreadyAccountButton.onClick.AddListener(OnClickHaveAlreadyAccountButton);
+        LogoutButton.onClick.AddListener(OnClickLogoutButton);
+        PlayButton.onClick.AddListener(OnClickPlayButton);
+    }
+
+    private void OnClickPlayButton()
+    {
+        SceneManager.LoadScene("Main Menu");
+    }
 }

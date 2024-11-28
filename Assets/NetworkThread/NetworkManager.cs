@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using EasyUI.Progress;
+using UnityEngine.SceneManagement;
 
 namespace NetworkThread
 {
@@ -9,26 +11,44 @@ namespace NetworkThread
         private static NetworkManager _instance;
 
         private bool IsConnecting = false;
+        private LoginScenesScript _loginScenesScript;
         
         private void Awake()
         {
-            if (_instance != null)
-            {   
-                Debug.Log("NetworkManager instance already exists!");
-                Destroy(gameObject);
-                return;
+            try
+            {
+                _loginScenesScript = FindObjectOfType<LoginScenesScript>();
+                Debug.Log($"FindObjectOfType<LoginScenesScript> ({_loginScenesScript})");
+            }
+            finally
+            {
+                if (_instance != null)
+                {   
+                    Debug.Log("NetworkManager instance already exists!");
+                    Destroy(gameObject);
+                    
+                }
+                else
+                {
+                    Debug.Log("Instantiating NetworkManager!");
+                    _instance = this;
+                    DontDestroyOnLoad(gameObject);
+                    NetworkStaticManager.InitializeGameManager();
+                }
             }
             
-            Debug.Log("Instantiating NetworkManager!");
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-            NetworkStaticManager.InitializeGameManager();
         }
 
         void Update()
         {
             if (!NetworkStaticManager.ClientHandle.IsConnected() && !IsConnecting)
             {
+                if (SceneManager.GetActiveScene().name != "Login")
+                {
+                    SceneManager.LoadScene("Login");
+                }
+                
+                _loginScenesScript.ShowLoadingPanel("Connecting...");
                 IsConnecting = true;
                 StartCoroutine(DiscoveryServer());
             }
@@ -36,7 +56,6 @@ namespace NetworkThread
             else if (NetworkStaticManager.ClientHandle.IsConnected() && IsConnecting)
             {
                 IsConnecting = false;
-                Progress.Hide();
             }
         }
 
@@ -45,10 +64,9 @@ namespace NetworkThread
             int time = 1;
             while (!NetworkStaticManager.ClientHandle.IsConnected())
             {
-                Progress.Show("Connecting to server ...", ProgressColor.Red);
                 Debug.Log($"Starting discovery: {time}");
                 NetworkStaticManager.ClientHandle.DiscoveryServer();
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(2f);
                 time++;
             }
         }

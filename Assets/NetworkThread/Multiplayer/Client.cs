@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Lidgren.Network;
 using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
 using UnityEngine;
-using Object = System.Object;
 
 namespace NetworkThread.Multiplayer
 {
@@ -77,7 +74,18 @@ namespace NetworkThread.Multiplayer
                         {
                             Debug.Log("Connected to server");
                             connected = true;
-                            ((LoginScenesScript)_uiScripts).LoginUsingPlayerPrefs();
+                            try
+                            {
+                                
+                                ((LoginScenesScript)_uiScripts).LoginUsingPlayerPrefs();
+                                Debug.Log("Login Using PlayerPrefs");
+                                
+                            }
+                            catch
+                            {
+                                //
+                            }
+                            
                         }
                         else if (message.SenderConnection.Status == NetConnectionStatus.Disconnected)
                         {
@@ -380,6 +388,17 @@ namespace NetworkThread.Multiplayer
             {
                 username = _username,
                 roomId = roomId
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        
+        public void SendLogoutPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new Logout()
+            {
+                username = _username,
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
