@@ -38,6 +38,11 @@ public class WaitingRoomScript : MonoBehaviour
     public GameObject prefab;
     public TextMeshProUGUI MsgLastest;
     public TMP_InputField textBox;
+
+    [Header("Items")] 
+    public GameObject SelectItemPopup;
+    public Button Item1;
+    public Button Item2;
     
     private GameObject _Me;
 
@@ -62,6 +67,8 @@ public class WaitingRoomScript : MonoBehaviour
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         NetworkStaticManager.ClientHandle.SendJoinRoomPacket(RoomModeTransfer.RoomMode);
         buttonBack.onClick.AddListener(OnButtonBackClick);
+        Item1.onClick.AddListener(() => OnItemClick(1));
+        Item2.onClick.AddListener(() => OnItemClick(2));
         
     }
 
@@ -75,6 +82,11 @@ public class WaitingRoomScript : MonoBehaviour
                 SendChatMessage();
             }
         }
+    }
+
+    void OnItemClick(int itemNo)
+    {
+        SelectItemPopup.SetActive(true);
     }
     
 

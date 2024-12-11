@@ -1,4 +1,0 @@
-repository "Fruits Battle 2D Game@jmaqhuy@cloud"
-  path "/"
-    br "/main"
-    co "/main"
