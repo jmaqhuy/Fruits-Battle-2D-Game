@@ -43,7 +43,6 @@ public class LoginScenesScript : MonoBehaviour
     {
         Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
         RegisterButtonClicked();
-        
     }
 
     private void OnClickLogoutButton()

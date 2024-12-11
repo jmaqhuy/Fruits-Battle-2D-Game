@@ -1,7 +1,5 @@
-using System;
 using UnityEngine;
 using System.Collections;
-using EasyUI.Progress;
 using UnityEngine.SceneManagement;
 
 namespace NetworkThread
@@ -19,6 +17,10 @@ namespace NetworkThread
             {
                 _loginScenesScript = FindObjectOfType<LoginScenesScript>();
                 Debug.Log($"FindObjectOfType<LoginScenesScript> ({_loginScenesScript})");
+                if (_loginScenesScript == null)
+                {
+                    Debug.LogError("LoginScenesScript not found in the scene!");
+                }
             }
             finally
             {
@@ -46,11 +48,16 @@ namespace NetworkThread
                 if (SceneManager.GetActiveScene().name != "Login")
                 {
                     SceneManager.LoadScene("Login");
+                    
+                }
+                else
+                {
+                    _loginScenesScript = FindObjectOfType<LoginScenesScript>();
+                    _loginScenesScript.ShowLoadingPanel("Connecting...");
+                    IsConnecting = true;
+                    StartCoroutine(DiscoveryServer());
                 }
                 
-                _loginScenesScript.ShowLoadingPanel("Connecting...");
-                IsConnecting = true;
-                StartCoroutine(DiscoveryServer());
             }
             
             else if (NetworkStaticManager.ClientHandle.IsConnected() && IsConnecting)

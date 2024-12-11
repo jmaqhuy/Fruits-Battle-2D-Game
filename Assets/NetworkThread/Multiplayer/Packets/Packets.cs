@@ -37,7 +37,12 @@ namespace NetworkThread.Multiplayer
 
         public enum Friend : byte
         {
-            FriendOnlinePacket = 30,
+            AllFriendPacket = 40,
+            FriendRequestPacket,
+            SentRequestPacket,
+            SuggestFriendPacket,
+            SearchFriendPacket,
+            BlockFriendPacket,
         }
 
         
@@ -306,7 +311,6 @@ namespace NetworkThread.Multiplayer
             {
                 Players.Add(PlayerInRoomPacket.Deserialize(message));
             }
-
         }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -317,7 +321,27 @@ namespace NetworkThread.Multiplayer
             {
                 p.Serialize(message);
             }   
-        
+        }
+    }
+
+    public class SuggestFriendPacket : Packet
+    {
+        public string username { get; set; }
+        public List<FriendTabPacket> Friends { get; set; } = new List<FriendTabPacket>();
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Friend.SuggestFriendPacket);
+            message.Write(username);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int friendCount = message.ReadInt32();
+            Friends.Clear();
+            for (int i = 0; i < friendCount; i++)
+            {
+                Friends.Add(FriendTabPacket.Deserialize(message));
+            }
         }
     }
 }

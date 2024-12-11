@@ -58,10 +58,10 @@ namespace NetworkThread.Multiplayer
                         {
                             HandleRoomPacket((PacketTypes.Room)type, message);
                         }
-                        /*else if (Enum.IsDefined(typeof(PacketTypes.Friend), type))
+                        else if (Enum.IsDefined(typeof(PacketTypes.Friend), type))
                         {
                             HandleFriendPacket((PacketTypes.Friend)type, message);
-                        }*/
+                        }
                         
                         else
                         {
@@ -104,12 +104,13 @@ namespace NetworkThread.Multiplayer
             }
         }
 
-        /*private void HandleFriendPacket(PacketTypes.Friend type, NetIncomingMessage message)
+        private void HandleFriendPacket(PacketTypes.Friend type, NetIncomingMessage message)
         {
             Packet packet;
+            FriendSceneScript scriptNow;
             switch (type)
             {
-                case PacketTypes.Friend.FriendOnlinePacket:
+                /*case PacketTypes.Friend.FriendOnlinePacket:
                     packet = new FriendOnlinePacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("Friend Online");
@@ -124,9 +125,23 @@ namespace NetworkThread.Multiplayer
                         // ignored
                     }
 
+                    break;*/
+                case PacketTypes.Friend.SuggestFriendPacket:
+                    packet = new SuggestFriendPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Suggest friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ParseSuggestFriendInfo((SuggestFriendPacket)packet);
+                    
+                    break;
+                    
+                default:
+                    Debug.Log("Unhandled message type");
                     break;
             }
-        }*/
+        }
+
+        
 
         private void HandleRoomPacket(PacketTypes.Room type, NetIncomingMessage message)
         {
@@ -411,6 +426,16 @@ namespace NetworkThread.Multiplayer
         {
             NetOutgoingMessage message = client.CreateMessage();
             new Logout()
+            {
+                username = _username,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendSuggestFriendPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new SuggestFriendPacket()
             {
                 username = _username,
             }.PacketToNetOutGoingMessage(message);
