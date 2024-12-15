@@ -69,6 +69,11 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("Friends");
     }
 
+    public void GoToCharacters()
+    {
+        SceneManager.LoadScene("Character Manager");
+    }
+
     public void ShowMyProfile()
     {
         displayNameProfile.text = displayName.text;

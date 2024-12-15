@@ -62,7 +62,14 @@ namespace NetworkThread.Multiplayer
                         {
                             HandleFriendPacket((PacketTypes.Friend)type, message);
                         }
-                        
+                        else if (Enum.IsDefined(typeof(PacketTypes.Character), type))
+                        {
+                            HandleCharacterPacket((PacketTypes.Character)type, message);
+                        }
+                        else if (Enum.IsDefined(typeof(PacketTypes.GameBattle), type))
+                        {
+                            HandleGameBattlePacket((PacketTypes.GameBattle)type, message);
+                        }
                         else
                         {
                             Debug.Log("Unhandled message type");
@@ -102,6 +109,37 @@ namespace NetworkThread.Multiplayer
                 }
                 client.Recycle(message);
             }
+        }
+
+        private void HandleGameBattlePacket(PacketTypes.GameBattle type, NetIncomingMessage message)
+        {
+            Packet packet;
+            switch (type)
+            {
+                case PacketTypes.GameBattle.StartGamePacket:
+                    ((WaitingRoomScript)_uiScripts).LoadMap();
+                    break;
+                default:
+                    Debug.Log("Unhandled Game Battle Packet type");
+                    break;
+            }
+        }
+
+        private void HandleCharacterPacket(PacketTypes.Character type, NetIncomingMessage message)
+        {
+            Packet packet;
+            switch (type)
+            {
+                case PacketTypes.Character.GetCurrentCharacterPacket:
+                    packet = new GetCurrentCharacterPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    ((CharacterManageUIScript)_uiScripts).GetCharacterPacket(((GetCurrentCharacterPacket)packet).Character);
+                    break;
+                default:
+                    Debug.Log("Unhandled Character packet type");
+                    break;
+            }
+
         }
 
         private void HandleFriendPacket(PacketTypes.Friend type, NetIncomingMessage message)
@@ -253,6 +291,9 @@ namespace NetworkThread.Multiplayer
                     }
                     
                     break;
+                case PacketTypes.General.RequireVerifyPacket:
+                    ((LoginScenesScript)_uiScripts).SignUpSuccess();
+                    break;
                 
                 case PacketTypes.General.SignUp:
                     Debug.Log("Type: Received Sign Up Packet");
@@ -303,6 +344,34 @@ namespace NetworkThread.Multiplayer
                     }
                     break;
                 
+                case PacketTypes.General.ResetPassword:
+                    Debug.Log("Type: Received ResetPassword Packet");
+                    packet = new ResetPassword();
+                    packet.NetIncomingMessageToPacket(message);
+                    if (((ResetPassword)packet).isSuccess)
+                    {
+                        ((LoginScenesScript)_uiScripts).ShowLoginPanel("Check Your Email to get New Password");
+                    }
+                    else
+                    {
+                        ((LoginScenesScript)_uiScripts).ResetPasswordFail(((ResetPassword)packet).reason);
+                    }
+                    break;
+                
+                case PacketTypes.General.VerifyRegistrationPacket:
+                    Debug.Log("Type: Received VerifyRegistration Packet");
+                    packet = new VerifyRegistrationPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    if (((VerifyRegistrationPacket)packet).isSuccess)
+                    {
+                        ((LoginScenesScript)_uiScripts).VerificationSuccess();
+                    }
+                    else
+                    {
+                        ((LoginScenesScript)_uiScripts).VerificationFail(((VerifyRegistrationPacket)packet).reason);
+                    }
+                    break;
+                
                 default:
                     Debug.Log($"Unhandled Packet type: {type}");
                     break;
@@ -321,6 +390,31 @@ namespace NetworkThread.Multiplayer
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
             Debug.Log("Sending request basic user info to server");
+        }
+
+        public void SendVerifyRegistrationPacket(string un, string otpCode)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new VerifyRegistrationPacket()
+            {
+                username = un,
+                otp = otpCode
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
+        public void SendPlayerReadyPacket(int roomId, bool isReady)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new PlayerReadyPacket()
+            {
+                Username = _username,
+                IsReady = isReady,
+                RoomId = roomId
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
         }
         
 
@@ -362,15 +456,14 @@ namespace NetworkThread.Multiplayer
             
         }
 
-        public void SendSignUpPackage(string username, string password)
+        public void SendSignUpPackage(string username, string password, string email)
         {
             NetOutgoingMessage message = client.CreateMessage();
             new SignUp()
             {
                 username = username,
-                password = password,
-                isSuccess = false,
-                reason = ""
+                email = email,
+                password = password
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
@@ -443,6 +536,29 @@ namespace NetworkThread.Multiplayer
             client.FlushSendQueue();
         }
 
+        public void SendResetPasswordPacket(string username, string email)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new ResetPassword()
+            {
+                username = username,
+                email = email,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
+        public void SendStartGamePacket(int roomId)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new StartGamePacket()
+            {
+                roomId = roomId,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
         public bool IsConnected()
         {
             return connected;
@@ -475,6 +591,15 @@ namespace NetworkThread.Multiplayer
         }
 
 
-        
+        public void SendCurrentCharacterPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new GetCurrentCharacterPacket()
+            {
+                Username = _username,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
     }
 }

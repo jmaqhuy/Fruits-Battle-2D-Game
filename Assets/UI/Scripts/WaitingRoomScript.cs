@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using NetworkThread;
 using NetworkThread.Multiplayer;
@@ -7,6 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class WaitingRoomScript : MonoBehaviour
 {
@@ -20,18 +23,8 @@ public class WaitingRoomScript : MonoBehaviour
     public RoomModeUI roomModeUI;
     public RoomMode roomMode; 
     
-    [Header("Team 1")]
-    public GameObject Player1;
-    public GameObject Player2;
-    public GameObject Player3;
-    public GameObject Player4;
-    
-    [Header("Team 2")]
-    public GameObject Player5;
-    public GameObject Player6;
-    public GameObject Player7;
-    public GameObject Player8;
-    private List<GameObject> playerList = new List<GameObject>();
+    [Header("Players")]
+    public GameObject[] playerList;
     
     [Header("ChatZone")]
     public RectTransform chatPanelZone;
@@ -44,19 +37,20 @@ public class WaitingRoomScript : MonoBehaviour
     public Button Item1;
     public Button Item2;
     
-    private GameObject _Me;
+    [Header("Host Panel")]
+    public GameObject hostPanel;
+    public Button StartButton;
+    
+    [Header("Guest Panel")]
+    public GameObject guestPanel;
+    public Button ReadyButton;
+    
+    private bool _isReady = false;
+    [Header("Error Panel")]
+    public GameObject errorPanel;
 
     void Awake()
     {
-        playerList.Add(Player1);
-        playerList.Add(Player2);
-        playerList.Add(Player3);
-        playerList.Add(Player4);
-        playerList.Add(Player5);
-        playerList.Add(Player6);
-        playerList.Add(Player7);
-        playerList.Add(Player8);
-        
         foreach (var player in playerList)
         {
             player.SetActive(false);
@@ -69,7 +63,72 @@ public class WaitingRoomScript : MonoBehaviour
         buttonBack.onClick.AddListener(OnButtonBackClick);
         Item1.onClick.AddListener(() => OnItemClick(1));
         Item2.onClick.AddListener(() => OnItemClick(2));
-        
+        ReadyButton.onClick.AddListener(PlayerReadyClick);
+        StartButton.onClick.AddListener(StartGameButtonClick);
+    }
+
+    private void StartGameButtonClick()
+    {
+        var numPlayerTeam1 = 0;
+        var numPlayerTeam2 = 0;
+        PlayerInWaitingRoom currentPlayer;
+        for (var i = 0; i < 4; i++)
+        {
+            if (playerList[i].activeSelf)
+            {
+                numPlayerTeam1++;
+                currentPlayer = playerList[i].GetComponent<PlayerInWaitingRoom>();
+                if (currentPlayer.isHost.activeSelf) continue;
+                if (currentPlayer.isReady.activeSelf == false )
+                {
+                    Debug.Log("Players Team 1 are not ready");
+                    StartCoroutine(ShowErrorPanel("Players are not ready"));
+                    return;
+                }
+                
+            }
+        }
+        for (var i = 4; i < playerList.Length; i++)
+        {
+            if (playerList[i].activeSelf)
+            {
+                numPlayerTeam2++;
+                currentPlayer = playerList[i].GetComponent<PlayerInWaitingRoom>();
+                if (currentPlayer.isHost.activeSelf) continue;
+                if (currentPlayer.isReady.activeSelf == false)
+                {
+                    Debug.Log("Players Team 2 are not ready");
+                    StartCoroutine(ShowErrorPanel("Players are not ready"));
+                    return;
+                }
+            }
+        }
+        if (numPlayerTeam1 != numPlayerTeam2)
+        {
+            StartCoroutine(ShowErrorPanel("The number of players on both teams is not balanced."));
+            return;
+        }
+        NetworkStaticManager.ClientHandle.SendStartGamePacket(_intRoomId);
+    }
+
+    private IEnumerator ShowErrorPanel(string message)
+    {
+        var seconds = 3;
+        while (seconds != 0)
+        {
+            errorPanel.GetComponentInChildren<TextMeshProUGUI>().text = message;
+            errorPanel.SetActive(true);
+            yield return new WaitForSeconds(1);
+            seconds--;
+        }
+        errorPanel.SetActive(false);
+    }
+
+    private void PlayerReadyClick()
+    {
+        Debug.Log("Player Ready");
+        _isReady = !_isReady;
+        NetworkStaticManager.ClientHandle.SendPlayerReadyPacket(_intRoomId, _isReady);
     }
 
     void Update()
@@ -105,6 +164,8 @@ public class WaitingRoomScript : MonoBehaviour
     {
         RoomName.text = "Room name: " + roomName;
     }
+    
+    public void LoadMap() { SceneManager.LoadScene("Normal Mode Map"); }
 
 
     public void PasteRoomInfo(JoinRoomPacket packet)
@@ -160,29 +221,6 @@ public class WaitingRoomScript : MonoBehaviour
         newMessage.transform.SetAsLastSibling();
         
     }
-
-    /*public void PasteMyChracterInfo(JoinRoomPacket packet)
-    {
-        if (packet.team == Team.Team1)
-        {
-            _Me = player1List[packet.position - 1];
-        }
-        else
-        {
-            _Me = player2List[packet.position - 1];
-        }
-
-        Debug.Log($"Team : {packet.team}, position : {packet.position}");
-        _Me.SetActive(true);
-        
-        UpdateMyChracterUI(_Me.GetComponent<PlayerInWaitingRoom>(), packet);
-    }
-
-    private void UpdateMyChracterUI(PlayerInWaitingRoom player, JoinRoomPacket packet)
-    {
-        player.PlayerName.text = packet.displayName;
-        player.isHost.SetActive(packet.isHost);
-    }*/
     public void SetUIForAll(JoinRoomPacketToAll packet)
     {
         HideAllPlayers(playerList);
@@ -196,7 +234,7 @@ public class WaitingRoomScript : MonoBehaviour
         }
     }
 
-    private void HideAllPlayers(List<GameObject> playerList)
+    private void HideAllPlayers(GameObject[] playerList)
     {
         foreach (var player in playerList)
         {
@@ -207,11 +245,25 @@ public class WaitingRoomScript : MonoBehaviour
     private void SetPlayerDetails(PlayerInWaitingRoom ui, PlayerInRoomPacket data)
     {
         ui.username = data.username;
-        if(ui.username == NetworkStaticManager.ClientHandle.GetUsername()) ui.PlayerName.color = Color.yellow;
+        if (ui.username == NetworkStaticManager.ClientHandle.GetUsername())
+        {
+            ui.PlayerName.color = Color.yellow;
+            hostPanel.SetActive(data.isHost);
+            guestPanel.SetActive(!data.isHost);
+        }
+        
         ui.isHost.SetActive(data.isHost);
         ui.PlayerName.text = data.displayname;
         ui.isReady.SetActive(data.isReady);
+        if (data.isReady)
+        {
+            ReadyButton.GetComponent<Image>().color = new Color32(159, 30, 20, 255);
+            ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Not Ready";
+        }
+        else
+        {
+            ReadyButton.GetComponent<Image>().color = new Color32(0, 135, 10, 255);
+            ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready";
+        }
     }
-
-    
 }

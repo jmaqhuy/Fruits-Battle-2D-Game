@@ -16,7 +16,10 @@ namespace NetworkThread.Multiplayer
             PlayerDisconnectsPacket,
             BasicUserInfoPacket,
             ChangeDisplayNamePacket,
-            Logout
+            Logout,
+            ResetPassword,
+            VerifyRegistrationPacket,
+            RequireVerifyPacket
         }
 
         public enum Shop : byte
@@ -31,8 +34,22 @@ namespace NetworkThread.Multiplayer
             JoinRoomPacketToAll,
             ExitRoomPacket,
             InviteFriendPacket,
-            SendChatMessagePacket
+            SendChatMessagePacket,
+            PlayerReadyPacket
             
+        }
+        public enum GameBattle : byte
+        {
+            StartGamePacket= 30,
+            PlayerOutGamePacket,
+            StartTurnPacket,
+            EndTurnPacket,
+            EndGamePacket,
+            PositionPacket,
+            HealthPointPacket,
+            PlayerDiePacket,
+            SpawnPlayerPacket,
+            Shoot
         }
 
         public enum Friend : byte
@@ -43,6 +60,11 @@ namespace NetworkThread.Multiplayer
             SuggestFriendPacket,
             SearchFriendPacket,
             BlockFriendPacket,
+        }
+
+        public enum Character : byte
+        {
+            GetCurrentCharacterPacket = 50,
         }
 
         
@@ -172,9 +194,52 @@ namespace NetworkThread.Multiplayer
         }
     }
 
+    public class ResetPassword : Packet
+    {
+        public string username { get; set; }
+        public string email { get; set; }
+        public bool isSuccess { get; set; }
+        public string reason { get; set; }
+
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.General.ResetPassword);
+            message.Write(username);
+            message.Write(email);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            isSuccess = message.ReadBoolean();
+            reason = message.ReadString();
+        }
+    }
+
+    public class VerifyRegistrationPacket : Packet
+    {
+        public string username { get; set; }
+        public string otp { get; set; }
+        public bool isSuccess { get; set; }
+        public string reason {get;set;}
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.General.VerifyRegistrationPacket);
+            message.Write(username);
+            message.Write(otp);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            isSuccess = message.ReadBoolean();
+            reason = message.ReadString();
+        }
+    }
+
     public class SignUp : Packet
     {
         public string username { get; set; }
+        public string email { get; set; }
         public string password { get; set; }
         public bool isSuccess { get; set; }
         public string reason { get; set; }
@@ -182,20 +247,18 @@ namespace NetworkThread.Multiplayer
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
             username = message.ReadString();
-            password = message.ReadString();
             isSuccess = message.ReadBoolean();
             reason = message.ReadString();
-            Debug.Log($"NetIncomingMessageToPacket: username: {username}, password: {password}, isSuccess: {isSuccess}, reason: {reason}");
+            Debug.Log($"NetIncomingMessageToPacket: username: {username}, isSuccess: {isSuccess}, reason: {reason}");
         }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
             message.Write((byte)PacketTypes.General.SignUp);
             message.Write(username);
+            message.Write(email);
             message.Write(password);
-            message.Write(isSuccess);
-            message.Write(reason);
-            Debug.Log($"PacketToNetOutGoingMessage: username: {username}, password: {password}, isSuccess: {isSuccess}, reason: {reason}");
+            Debug.Log($"PacketToNetOutGoingMessage: username: {username}, email: {email}, password: {password}");
         }
     }
     public class PlayerDisconnectsPacket : Packet
@@ -342,6 +405,59 @@ namespace NetworkThread.Multiplayer
             {
                 Friends.Add(FriendTabPacket.Deserialize(message));
             }
+        }
+    }
+
+    public class GetCurrentCharacterPacket : Packet
+    {
+        public string Username { get; set; }
+        public CharacterPacket Character { get; set; }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Character.GetCurrentCharacterPacket);
+            message.Write(Username);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            Character = CharacterPacket.Deserialize(message);
+        }
+    }
+
+    public class PlayerReadyPacket : Packet
+    {
+        public string Username { get; set; }
+        public bool IsReady { get; set; }
+        public int RoomId { get; set; }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.PlayerReadyPacket);
+            message.Write(Username);
+            message.Write(IsReady);
+            message.Write(RoomId);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            Username = message.ReadString();
+            IsReady = message.ReadBoolean();
+            RoomId = message.ReadInt32();
+        }
+    }
+
+    public class StartGamePacket : Packet
+    {
+        public int roomId { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.GameBattle.StartGamePacket);
+            message.Write(roomId);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            roomId = message.ReadInt32();
         }
     }
 }
