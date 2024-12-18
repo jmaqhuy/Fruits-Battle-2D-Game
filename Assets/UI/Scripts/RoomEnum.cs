@@ -4,6 +4,7 @@ namespace RoomEnum
 {
     public enum RoomMode
     {
+        All,
         Normal,
         BotArea,
         Rank
@@ -17,10 +18,10 @@ namespace RoomEnum
 
     public enum RoomType
     {
+        All = 0,
         OneVsOne = 2,
         TwoVsTwo = 4,
         FourVsFour = 8,
-        None
     }
     
     public enum Team

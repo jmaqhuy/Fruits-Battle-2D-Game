@@ -75,7 +75,6 @@ public class CharacterInfoTabScript : MonoBehaviour
         _currentArmorPoint = _newArmorPoint =cArmorPoint;
         _currentLuckyPoint = _newLuckyPoint = cLuckyPoint;
         _availablePoint = _remainingPoints = avPoint;
-        Debug.Log(_availablePoint);
         
         characterHpPoint.text = _currentHpPoint.ToString();
         characterDamagePoint.text = _currentDamagePoint.ToString();

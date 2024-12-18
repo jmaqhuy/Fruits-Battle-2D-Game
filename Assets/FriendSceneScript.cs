@@ -114,6 +114,11 @@ public class FriendSceneScript : MonoBehaviour
 
     private void GetSuggestFriend()
     {
+        foreach (var qr in _queryResults)
+        {
+            Destroy(qr);
+        }
+        _queryResults.Clear();
         NetworkStaticManager.ClientHandle.SendSuggestFriendPacket();
     }
 
@@ -139,6 +144,7 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
+            friend.SetActive(true);
         }
 
         SuggestResultPrefab.SetActive(false);

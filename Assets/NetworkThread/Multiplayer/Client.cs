@@ -124,12 +124,14 @@ namespace NetworkThread.Multiplayer
                 case PacketTypes.GameBattle.StartGamePacket:
 
                     break;
-                case PacketTypes.GameBattle.SpawnPlayerPacket:
+                case PacketTypes.GameBattle.SpawnPlayerPacketToAll:
                     Debug.Log("get spawn packet");
-                    packet = new SpawnPlayerPacket();
+                    packet = new SpawnPlayerPacketToAll();
                     packet.NetIncomingMessageToPacket(message);
-                    script = (GameBattle)_uiScripts;
-                    script.SpawnPlayer((SpawnPlayerPacket)packet);
+                    if (_uiScripts is WaitingRoomScript wrscript)
+                    {
+                        wrscript.ReceiveStartGame((SpawnPlayerPacketToAll)packet);
+                    }
                     break;
                 case PacketTypes.GameBattle.PlayerOutGamePacket:
                     break;
@@ -198,30 +200,13 @@ namespace NetworkThread.Multiplayer
             client.FlushSendQueue();
             Debug.Log("Send end turn for player" + playerName);
         }
-        public void StartGame()
-        {
-            NetOutgoingMessage message = client.CreateMessage();
-            new GameStartPacket() { }.PacketToNetOutGoingMessage(message);
-            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
-            client.FlushSendQueue();
-            Debug.Log("Send start game signal in room");
 
-
-        }
         public void SendHPPacket(string playerName, int HP)
         {
             NetOutgoingMessage message = client.CreateMessage();
             new HealthPointPacket() { PlayerName = playerName, HP = HP }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
-        }
-        public void StartGameInBattle()
-        {
-            NetOutgoingMessage message = client.CreateMessage();
-            new StartGamePacket() { }.PacketToNetOutGoingMessage(message);
-            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
-            client.FlushSendQueue();
-            Debug.Log("Send start game signal");
         }
         public void SendShootPacket(string playerName, float angle, float force, float X, float Y)
         {
@@ -248,7 +233,10 @@ namespace NetworkThread.Multiplayer
                 case PacketTypes.Character.GetCurrentCharacterPacket:
                     packet = new GetCurrentCharacterPacket();
                     packet.NetIncomingMessageToPacket(message);
-                    ((CharacterManageUIScript)_uiScripts).GetCharacterPacket(((GetCurrentCharacterPacket)packet).Character);
+                    if (_uiScripts is MainMenu mainMenu)
+                    {
+                        mainMenu.LoadCharacterScene((GetCurrentCharacterPacket)packet);
+                    }
                     break;
                 default:
                     Debug.Log("Unhandled Character packet type");
@@ -306,16 +294,25 @@ namespace NetworkThread.Multiplayer
                     packet = new JoinRoomPacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("Room joined");
-                    scriptNow = (WaitingRoomScript)_uiScripts;
-                    scriptNow.PasteRoomInfo((JoinRoomPacket)packet);
-                    /*waitingroom.PasteMyChracterInfo((JoinRoomPacket)packet);*/
+                    if (_uiScripts is SelectPlayModeScript selectMode1)
+                    {
+                        selectMode1.ParseRoomInfoData(((JoinRoomPacket)packet).room);
+                    } else if (_uiScripts is WaitingRoomScript waitingRoomScript)
+                    {
+                        waitingRoomScript.PasteRoomInfo(((JoinRoomPacket)packet).room);
+                    }
                     break;
                 
                 case PacketTypes.Room.JoinRoomPacketToAll:
                     packet = new JoinRoomPacketToAll();
                     packet.NetIncomingMessageToPacket(message);
-                    scriptNow = (WaitingRoomScript)_uiScripts;
-                    scriptNow.SetUIForAll((JoinRoomPacketToAll)packet);
+                    if (_uiScripts is SelectPlayModeScript selectMode2)
+                    {
+                        selectMode2.ParsePlayerInRoomData((JoinRoomPacketToAll)packet);
+                    } else if (_uiScripts is WaitingRoomScript waitingRoomScript)
+                    {
+                        waitingRoomScript.SetUIForAll(((JoinRoomPacketToAll)packet).Players);
+                    }
                     break;
                 
                 case PacketTypes.Room.InviteFriendPacket:
@@ -338,13 +335,25 @@ namespace NetworkThread.Multiplayer
                         ((SendChatMessagePacket)packet).DisplayName,
                         ((SendChatMessagePacket)packet).Message);
                     break;
-                case PacketTypes.Room.GameStartPacket:
+                /*case PacketTypes.Room.GameStartPacket:
                     Debug.Log("recive Game start packet");
                     packet = new GameStartPacket();
                     packet.NetIncomingMessageToPacket(message);
                     scriptNow = (WaitingRoomScript)_uiScripts;
                     scriptNow.LoadMap();
                     scriptNow.SendStartGameInBattle((GameStartPacket)packet);
+                    break;*/
+                
+                case PacketTypes.Room.RoomListPacket:
+                    packet = new RoomListPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    if (_uiScripts is SelectPlayModeScript selectMode3)
+                    {
+                        selectMode3.ParseRoomList((RoomListPacket)packet);
+                    }
+                    break;
+                default:
+                    Debug.Log("Unhandled Room message type");
                     break;
             }
         }
@@ -371,8 +380,8 @@ namespace NetworkThread.Multiplayer
 
         public void DiscoveryServer()
         {
-            client.DiscoverLocalPeers(14242);
-            /*client.Connect()*/
+            /*client.DiscoverLocalPeers(14242);*/
+            client.Connect("35.232.232.21", 14242);
         }
         
         
@@ -441,18 +450,9 @@ namespace NetworkThread.Multiplayer
                     packet = new BasicUserInfoPacket();
                     packet.NetIncomingMessageToPacket(message);
                     
-                    var mainMenuScript = (MainMenu)_uiScripts;
-                    mainMenuScript.SetDisplayNameTMP(((BasicUserInfoPacket)packet).displayName);
-                    mainMenuScript.SetCoinsTMP(((BasicUserInfoPacket)packet).coin);
-                    loadBasicUserInfo = true;
-                    
-                    if ( string.IsNullOrEmpty(((BasicUserInfoPacket)packet).displayName) )
+                    if (_uiScripts is LoginScenesScript loginScript)
                     {
-                        mainMenuScript.ShowChangeDisplayNamePanel();
-                    }
-                    else
-                    {
-                        mainMenuScript.HideChangeDisplayNamePanel();
+                        loginScript.ParseUserData((BasicUserInfoPacket)packet);
                     }
                     break;
                 
@@ -610,15 +610,16 @@ namespace NetworkThread.Multiplayer
             Debug.Log("Sending Sign Up package to server");
         }
 
-        public void SendJoinRoomPacket(RoomMode selectedRoomMode)
+        public void SendJoinRoomPacket(RoomMode selectedRoomMode, RoomType roomType, int roomId = 0)
         {
             NetOutgoingMessage message = client.CreateMessage();
             new JoinRoomPacket()
             {
                 room = new RoomPacket()
                 {
+                    Id = roomId,
                     roomMode = selectedRoomMode,
-                    roomType = RoomType.TwoVsTwo
+                    roomType = roomType
                 }
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
@@ -671,12 +672,12 @@ namespace NetworkThread.Multiplayer
             client.FlushSendQueue();
         }
 
-        public void SendStartGamePacket()
+        public void SendStartGamePacket(int rId)
         {
             NetOutgoingMessage message = client.CreateMessage();
             new StartGamePacket()
             {
-                
+                roomId = rId
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
@@ -722,6 +723,13 @@ namespace NetworkThread.Multiplayer
                 Username = _username,
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendRoomListPacket()
+        {
+            NetOutgoingMessage outmsg = client.CreateMessage();
+            new RoomListPacket().PacketToNetOutGoingMessage(outmsg);
+            client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
     }

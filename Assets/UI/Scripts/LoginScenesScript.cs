@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
+using DataTransfer;
 using NetworkThread;
+using NetworkThread.Multiplayer;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -9,6 +11,7 @@ using UnityEngine.SceneManagement;
 
 public class LoginScenesScript : MonoBehaviour
 {
+    public UserData userData;
     [Header("Panels")]
     public GameObject signUpPanel;
     public GameObject forgotPasswordPanel;
@@ -81,20 +84,14 @@ public class LoginScenesScript : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < digits.Length; i++)
-        {
-            int index = i; // Lưu chỉ số hiện tại (để tránh lỗi closure)
-            digits[i].onValueChanged.AddListener((text) => OnInputChanged(index, text));
-        }
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
-        NetworkStaticManager.ClientHandle.GetScriptNameNow();
-        loadingText.text = "";
         for (int i = 0; i < digits.Length; i++)
         {
-            int index = i; // Lưu chỉ số hiện tại (để tránh lỗi closure)
+            int index = i;
             digits[i].onValueChanged.AddListener((text) => OnInputChanged(index, text));
         }
-        ShowLoadingPanel();
+        loadingText.text = "";
+        ShowLoginPanel();
     }
     
     public void OnLoginButtonClicked()
@@ -216,6 +213,7 @@ public class LoginScenesScript : MonoBehaviour
     public void LoginSuccess()
     {
         ShowSuccessPanel(NetworkStaticManager.ClientHandle.GetUsername());
+        NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
     }
 
     public void LoginFail()
@@ -369,16 +367,20 @@ public class LoginScenesScript : MonoBehaviour
         ShowLoadingPanel("Verifying");
     }
 
+    public void ParseUserData(BasicUserInfoPacket packet)
+    {
+        userData.UserInfo = packet;
+    }
+    
     private void OnInputChanged(int index, string text)
     {
-        // Chỉ chuyển focus nếu nhập đúng 1 ký tự
         if (text.Length == 1 && index < digits.Length - 1)
         {
-            digits[index + 1].Select(); // Chuyển focus sang ô tiếp theo
+            digits[index + 1].Select();
         }
         else if (text.Length == 0 && index > 0)
         {
-            digits[index - 1].Select(); // Quay lại ô trước đó nếu ô hiện tại bị xóa
+            digits[index - 1].Select();
         }
     }
 

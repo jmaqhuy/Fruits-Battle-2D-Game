@@ -5,6 +5,7 @@ using UnityEngine;
 using Code_Battle_System.Character;
 using NetworkThread;
 using System.Collections;
+using RoomEnum;
 
 
 namespace Code_Battle_System.Bullet

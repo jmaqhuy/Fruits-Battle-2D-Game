@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using NetworkThread;
@@ -9,12 +8,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-using Unity.VisualScripting;
-using System.Threading.Tasks;
+using DataTransfer;
+using UnityEngine.Serialization;
+
 public class WaitingRoomScript : MonoBehaviour
 {
     // Start is called before the first frame update
     public Button buttonBack;
+    public RoomData roomData;
+    public PositionsData positionsData;
+    
     [Header("Room Info")]
     public TextMeshProUGUI RoomId;
     private int _intRoomId;
@@ -58,13 +61,17 @@ public class WaitingRoomScript : MonoBehaviour
     }
     void Start()
     {
+        if (roomData.RoomPacket != null)
+        {
+            PasteRoomInfo(roomData.RoomPacket);
+            SetUIForAll(roomData.PlayersInRoom);
+        }
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
-        NetworkStaticManager.ClientHandle.SendJoinRoomPacket(RoomModeTransfer.RoomMode);
         buttonBack.onClick.AddListener(OnButtonBackClick);
         Item1.onClick.AddListener(() => OnItemClick(1));
         Item2.onClick.AddListener(() => OnItemClick(2));
         ReadyButton.onClick.AddListener(PlayerReadyClick);
-        StartButton.onClick.AddListener(SendStartGame);
+        StartButton.onClick.AddListener(StartGameButtonClick);
     }
 
     private void StartGameButtonClick()
@@ -108,7 +115,7 @@ public class WaitingRoomScript : MonoBehaviour
             StartCoroutine(ShowErrorPanel("The number of players on both teams is not balanced."));
             return;
         }
-        NetworkStaticManager.ClientHandle.SendStartGamePacket();
+        NetworkStaticManager.ClientHandle.SendStartGamePacket(_intRoomId);
     }
 
     private IEnumerator ShowErrorPanel(string message)
@@ -151,16 +158,21 @@ public class WaitingRoomScript : MonoBehaviour
 
     void OnButtonBackClick()
     {
+        if (_isReady)
+        {
+            StartCoroutine(ShowErrorPanel("You can't go out because you are ready!"));
+            return;
+        }
         NetworkStaticManager.ClientHandle.SendExitRoomPacket(_intRoomId);
         SceneManager.LoadScene("Select Play Mode");
     }
 
-    public void SetRoomID(string roomID)
+    private void SetRoomID(string roomID)
     {
         RoomId.text = "RoomID: "+roomID;
     }
 
-    public void SetRoomName(string roomName)
+    private void SetRoomName(string roomName)
     {
         RoomName.text = "Room name: " + roomName;
     }
@@ -168,17 +180,16 @@ public class WaitingRoomScript : MonoBehaviour
     public void LoadMap() { SceneManager.LoadScene("Normal Mode Map"); }
 
 
-    public void PasteRoomInfo(JoinRoomPacket packet)
+    public void PasteRoomInfo(RoomPacket room)
     {
-        _intRoomId = packet.room.Id;
+        _intRoomId = room.Id;
         SetRoomID(_intRoomId + "");
-        SetRoomName(packet.room.Name);
-        roomModeUI.SetBannerRoomMode(packet.room.roomMode);
-        SetRoomType(packet.room.roomType);
-        
+        SetRoomName(room.Name);
+        roomModeUI.SetBannerRoomMode(room.roomMode);
+        SetRoomType(room.roomType);
     }
 
-    public void SetRoomType(RoomType rT)
+    private void SetRoomType(RoomType rT)
     {
         switch (rT)
         {
@@ -213,7 +224,11 @@ public class WaitingRoomScript : MonoBehaviour
             Debug.Log("Set message color");
             textComponent.color = Color.yellow;
             MsgLastest.color = Color.yellow;
-            
+        }
+        else
+        {
+            textComponent.color = Color.white;
+            MsgLastest.color = Color.white;
         }
         textComponent.text = displayName + ": "+msg;
         MsgLastest.text = displayName + ": "+msg;
@@ -221,16 +236,15 @@ public class WaitingRoomScript : MonoBehaviour
         newMessage.transform.SetAsLastSibling();
         
     }
-    public void SetUIForAll(JoinRoomPacketToAll packet)
+    public void SetUIForAll(List<PlayerInRoomPacket> players)
     {
         HideAllPlayers(playerList);
         
-        foreach (var player in packet.Players)
+        foreach (var player in players)
         {
             Debug.Log($"Player Team: {player.team}, Player Position: {player.Position}");
-            playerList[player.Position - 1 ].SetActive(true);
             SetPlayerDetails(playerList[player.Position - 1].GetComponent<PlayerInWaitingRoom>(), player);
-            
+            playerList[player.Position - 1 ].SetActive(true);
         }
     }
 
@@ -250,23 +264,25 @@ public class WaitingRoomScript : MonoBehaviour
             ui.PlayerName.color = Color.yellow;
             hostPanel.SetActive(data.isHost);
             guestPanel.SetActive(!data.isHost);
+            _isReady = data.isReady;
+            if (data.isReady)
+            {
+                ReadyButton.GetComponent<Image>().color = new Color32(159, 30, 20, 255);
+                ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Not Ready";
+            }
+            else
+            {
+                ReadyButton.GetComponent<Image>().color = new Color32(0, 135, 10, 255);
+                ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready";
+            }
         }
         
         ui.isHost.SetActive(data.isHost);
         ui.PlayerName.text = data.displayname;
         ui.isReady.SetActive(data.isReady);
-        if (data.isReady)
-        {
-            ReadyButton.GetComponent<Image>().color = new Color32(159, 30, 20, 255);
-            ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Not Ready";
-        }
-        else
-        {
-            ReadyButton.GetComponent<Image>().color = new Color32(0, 135, 10, 255);
-            ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready";
-        }
+        
     }
-    public async void SendStartGameInBattle(GameStartPacket packet)
+    /*public async void SendStartGameInBattle(GameStartPacket packet)
 
     {
         GameStartPacket same = packet;
@@ -277,9 +293,14 @@ public class WaitingRoomScript : MonoBehaviour
         {
             Debug.Log(NetworkStaticManager.ClientHandle.GetUsername() + " " + packet.username + " " + packet.isHost);
         }
-    }
-    public void SendStartGame()
+    }*/
+    /*public void SendStartGame()
     {
         NetworkStaticManager.ClientHandle.StartGame();
+    }*/
+    public void ReceiveStartGame(SpawnPlayerPacketToAll packet)
+    {
+        positionsData.spawnPlayerPackets = packet.SPPacket;
+        LoadMap();
     }
 }

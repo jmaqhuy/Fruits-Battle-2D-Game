@@ -3,13 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using NetworkThread;
+using RoomEnum;
+
 namespace Code_Battle_System.Character
 {
-    public enum Team 
-    {
-        Team1,
-        Team2
-    }
     public class Unit : MonoBehaviour
     {
         private string unitName;
@@ -61,10 +58,11 @@ namespace Code_Battle_System.Character
 
         }
 
-        public void setUnitName(string unitName)
+        public void setUnitName(string unitName, Color c)
         {
             this.unitName = unitName;
             nameText.text = unitName;
+            nameText.color = c;
         }
 
         public int getHealthCurrent()
@@ -101,16 +99,9 @@ namespace Code_Battle_System.Character
         {
             return this.isLeft;
         }
-        public void setTeam(string team)
+        public void setTeam(Team team)
         {
-            if(team == "team1")
-            {
-                playerTeam = Team.Team1;
-            }
-            else
-            {
-                playerTeam = Team.Team2;
-            }
+            playerTeam = team;
         }
         public Team getTeam()
         {

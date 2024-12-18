@@ -1,20 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 using Cinemachine;
 using Code_Battle_System.BatlleSystem;
 using Code_Battle_System.Bullet;
 using Code_Battle_System.Character;
-using Lidgren.Network;
+using DataTransfer;
 using NetworkThread;
 using NetworkThread.Multiplayer;
-using UI.Scripts;
-
+using NetworkThread.Multiplayer.Packets;
+using RoomEnum;
+using TMPro;
 using UnityEngine;
-using static NetworkThread.Multiplayer.PacketTypes;
 
 public class GameBattle : MonoBehaviour
 {
+    [Header("Battle Information")]
+    public TextMeshProUGUI TimeText;
+    
     public GameObject playerPrefab;
     public GameObject bulletPrefab;
     public Quaternion quaternion;
@@ -22,25 +25,33 @@ public class GameBattle : MonoBehaviour
     public GameObject characterController;
     // Ensure this is assigned in the Inspector
     public Dictionary<string, GameObject> Players;
+    public PositionsData positionsData;
+    public RoomData roomData;
+    private Team _myTeam;
+    private Coroutine clockCoroutine;
+    private Coroutine blinkNameCoroutine;
+    private GameObject _currentPlayerName;
+    
 
     private void Awake()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
-
-
+        _myTeam = roomData.PlayersInRoom
+            .FirstOrDefault(u => u.username == NetworkStaticManager.ClientHandle.GetUsername())
+            .team;
+        Players = new Dictionary<string, GameObject>();
+        foreach (var packet in positionsData.spawnPlayerPackets)
+        {
+            StartCoroutine(SpawnPlayer(packet));
+        }
+        Debug.Log(positionsData.spawnPlayerPackets.Count + " players spawned");
     }
 
     void Start()
     {
         Debug.Log("OK");
-        Players = new Dictionary<string, GameObject>();
-
-
     }
-    private void Update()
-    {
 
-    }
     public void EndGame(EndGamePacket packet)
     {
         Unit script = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponent<Unit>();
@@ -57,14 +68,51 @@ public class GameBattle : MonoBehaviour
             Debug.Log("You Lose");
         }
     }
-    public void SpawnPlayer(SpawnPlayerPacket packet)
+
+    private IEnumerator Clock(int start)
+    {
+        while (start-- > 0)
+        { 
+            TimeText.text = start.ToString();
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    private IEnumerator BlinkName(GameObject playerName)
+    {
+        while (true)
+        {
+            playerName.SetActive(!playerName.activeSelf);
+            yield return new WaitForSeconds(1);
+        }
+    }
+    
+    void StopAllCoroutinesManually(GameObject playerName = null)
+    {
+        if (clockCoroutine != null)
+        {
+            StopCoroutine(clockCoroutine);
+            clockCoroutine = null;
+        }
+        if (blinkNameCoroutine != null)
+        {
+            StopCoroutine(blinkNameCoroutine);
+            blinkNameCoroutine = null;
+        }
+        if (playerName != null)
+        {
+            playerName.SetActive(true);
+        }
+    }
+
+    private IEnumerator SpawnPlayer(SpawnPlayerPacket packet)
     {
         Debug.Log("Spawn player: " + packet.playerSpawn + " " + packet.X + " " + packet.Y);
 
         if (playerPrefab == null)
         {
             Debug.LogError("Player prefab is not assigned in the Inspector.");
-            return;
+            yield return null;
         }
 
         Vector3 position = new Vector3(packet.X, packet.Y, 0); // Adjust Z-axis if needed
@@ -88,7 +136,9 @@ public class GameBattle : MonoBehaviour
         script.setLucky(packet.Lucky);
         script.setArmor(packet.Amor);
         script.setIsLest(true);
-        script.setUnitName(packet.playerSpawn);
+        Color color = _myTeam == packet.Team ? Color.green : Color.red;
+        if (packet.playerSpawn == NetworkStaticManager.ClientHandle.GetUsername()) color = Color.yellow;
+        script.setUnitName(packet.playerSpawn , color);
         Physics.SyncTransforms();
         player.SetActive(true);
         Players[packet.playerSpawn] = player;
@@ -96,6 +146,8 @@ public class GameBattle : MonoBehaviour
     }
     public void GetTurn(StartTurnPacket packet)
     {
+        
+        StopAllCoroutinesManually(_currentPlayerName);
         if (Players.ContainsKey(NetworkStaticManager.ClientHandle.GetUsername()))
         {
             if (NetworkStaticManager.ClientHandle.GetUsername() == packet.playerName)
@@ -113,7 +165,9 @@ public class GameBattle : MonoBehaviour
 
         }
         focusCamera.Follow = Players[packet.playerName].transform;
-
+        clockCoroutine = StartCoroutine(Clock(10));
+        _currentPlayerName = Players[packet.playerName].GetComponent<Unit>().nameText.gameObject;
+        blinkNameCoroutine = StartCoroutine(BlinkName(_currentPlayerName));
 
     }
     public void EndTurn(EndTurnPacket packet)

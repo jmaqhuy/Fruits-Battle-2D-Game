@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using DataTransfer;
 using NetworkThread;
 using NetworkThread.Multiplayer.Packets;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CharacterManageUIScript : MonoBehaviour
 {
@@ -14,43 +17,38 @@ public class CharacterManageUIScript : MonoBehaviour
     public GameObject SelectCharacterPanel;
     public SelectCharacterTabScript SelectCharacterTabScript;
     
+    public CharactersData CharactersData;
+    
     private Animator _animator;
-    // Start is called before the first frame update
+    
     void Start()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
-        NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
-        
+        var cp = CharactersData.Characters
+            .FirstOrDefault(c => c.IsSelected);
+        UpdateCharacterInfoPanel(cp);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void UpdateCharacterInfoPanel(CharacterPacket cp)
     {
-        
-    }
-
-    public void GetCharacterPacket(CharacterPacket packet)
-    {
-        _currentCharacter = packet;
-        StartCoroutine(UpdateCharacterInfoPanel());
-    }
-
-    private IEnumerator UpdateCharacterInfoPanel()
-    {
-        var name = _currentCharacter.CharacterName;
-        var level = _currentCharacter.CharacterLevel;
-        var exp = _currentCharacter.CharacterXp;
-        var hp = _currentCharacter.CharacterHp;
-        var damage = _currentCharacter.CharacterDamage;
-        var armor = _currentCharacter.CharacterArmor;
-        var luck = _currentCharacter.CharacterLuck;
-        var hpPoint = _currentCharacter.HpPoint;
-        var damagePoint = _currentCharacter.DamagePoint;
-        var armorPoint = _currentCharacter.ArmorPoint;
-        var luckPoint = _currentCharacter.LuckPoint;
+        var name = cp.CharacterName;
+        var level = cp.CharacterLevel;
+        var exp = cp.CharacterXp;
+        var hp = cp.CharacterHp;
+        var damage = cp.CharacterDamage;
+        var armor = cp.CharacterArmor;
+        var luck = cp.CharacterLuck;
+        var hpPoint = cp.HpPoint;
+        var damagePoint = cp.DamagePoint;
+        var armorPoint = cp.ArmorPoint;
+        var luckPoint = cp.LuckPoint;
         CharacterInfoTabScript.ParseCharacterProperties(hpPoint, damagePoint, armorPoint, luckPoint,
             level-1-(hpPoint + damagePoint + armorPoint + luckPoint));
         CharacterInfoTabScript.ParseCharacterBaseInfo(name, level, exp, hp, damage, armor, luck);
-        yield return null;
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("Main Menu");
     }
 }

@@ -529,7 +529,6 @@ GameObject:
   - component: {fileID: 6612793452765217409}
   - component: {fileID: 3279662494775839832}
   - component: {fileID: 5843910138090299494}
-  - component: {fileID: 6342150406050686117}
   m_Layer: 5
   m_Name: ChangeDisplayName
   m_TagString: Untagged
@@ -599,21 +598,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6342150406050686117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3651678119010115004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93298d591ef79fb45a46213eda1fc831, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  closeButton: {fileID: 4204204155369612016}
-  newDisplayName: {fileID: 5742133451097469552}
-  acceptButton: {fileID: 3726037682265313360}
 --- !u!1 &7081739433690698230
 GameObject:
   m_ObjectHideFlags: 0
