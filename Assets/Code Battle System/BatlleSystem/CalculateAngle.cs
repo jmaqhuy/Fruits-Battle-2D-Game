@@ -14,9 +14,16 @@ namespace Code_Battle_System.BatlleSystem
         private float angle2;
         private Vector2 direction;
 
+        private void Start()
+        {
+            GameObject point = GameObject.Find("target");
+            target = point.transform;
+            GameObject textObject = GameObject.Find("AngleText");
+            angleText = textObject.GetComponent<TextMeshProUGUI>();
+        }
         private void Update()
         {
-            direction = target.position - Player.transform.position;
+            direction = target.position - gameObject.transform.position;
             angle = Vector2.Angle(Vector2.right, direction);
             if (angle > 90)
             {

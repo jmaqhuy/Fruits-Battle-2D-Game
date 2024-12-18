@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using Lidgren.Network;
 using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
 using UnityEngine;
+using static NetworkThread.Multiplayer.PacketTypes;
 
 namespace NetworkThread.Multiplayer
 {
@@ -113,16 +115,129 @@ namespace NetworkThread.Multiplayer
 
         private void HandleGameBattlePacket(PacketTypes.GameBattle type, NetIncomingMessage message)
         {
+            string deviceId = NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier);
+            List<NetConnection> players = new List<NetConnection>();
             Packet packet;
+            GameBattle script;
             switch (type)
             {
                 case PacketTypes.GameBattle.StartGamePacket:
-                    ((WaitingRoomScript)_uiScripts).LoadMap();
+
                     break;
-                default:
-                    Debug.Log("Unhandled Game Battle Packet type");
+                case PacketTypes.GameBattle.SpawnPlayerPacket:
+                    Debug.Log("get spawn packet");
+                    packet = new SpawnPlayerPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.SpawnPlayer((SpawnPlayerPacket)packet);
                     break;
+                case PacketTypes.GameBattle.PlayerOutGamePacket:
+                    break;
+                case PacketTypes.GameBattle.StartTurnPacket:
+                    Debug.Log("get turn packet");
+                    packet = new StartTurnPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.GetTurn((StartTurnPacket)packet);
+                    break;
+                case PacketTypes.GameBattle.EndTurnPacket:
+                    packet = new EndTurnPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.EndTurn((EndTurnPacket)packet);
+                    break;
+                case PacketTypes.GameBattle.EndGamePacket:
+                    packet = new EndGamePacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.EndGame((EndGamePacket)packet);
+                    break;
+                case PacketTypes.GameBattle.PositionPacket:
+                    packet = new PositionPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.UpdatePosition((PositionPacket)packet);
+                    break;
+
+                case PacketTypes.GameBattle.HealthPointPacket:
+                    packet = new HealthPointPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.UpdateHP((HealthPointPacket)packet);
+                    break;
+                case PacketTypes.GameBattle.PlayerDiePacket:
+                    packet = new PlayerDiePacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.PlayerDie((PlayerDiePacket)packet);
+                    break;
+                case PacketTypes.GameBattle.Shoot:
+                    Debug.Log("get shoot packet");
+                    packet = new Shoot();
+                    packet.NetIncomingMessageToPacket(message);
+                    script = (GameBattle)_uiScripts;
+                    script.Shoot((Shoot)packet);
+                    break;
+                default: break;
+
             }
+        }
+        public void SendPlayerDie(string playerName)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new PlayerDiePacket() { player = playerName }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            Debug.Log("Send player die for player" + playerName);
+        }
+        public void SendEndTurn(string playerName)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new EndTurnPacket() { playerName = playerName }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            Debug.Log("Send end turn for player" + playerName);
+        }
+        public void StartGame()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new GameStartPacket() { }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            Debug.Log("Send start game signal in room");
+
+
+        }
+        public void SendHPPacket(string playerName, int HP)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new HealthPointPacket() { PlayerName = playerName, HP = HP }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void StartGameInBattle()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new StartGamePacket() { }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            Debug.Log("Send start game signal");
+        }
+        public void SendShootPacket(string playerName, float angle, float force, float X, float Y)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new Shoot() { playerName = playerName, angle = angle, force = force, X = X, Y = Y }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            Debug.Log("Send shoot packet for " + playerName + " angle: " + angle + " force: " + force + " X: " + X + " Y: " + Y);
+        }
+        public void SendPositionPacket(string playerName, float X, float Y)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new PositionPacket() { playerName = playerName, X = X, Y = Y }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+
         }
 
         private void HandleCharacterPacket(PacketTypes.Character type, NetIncomingMessage message)
@@ -223,7 +338,14 @@ namespace NetworkThread.Multiplayer
                         ((SendChatMessagePacket)packet).DisplayName,
                         ((SendChatMessagePacket)packet).Message);
                     break;
-                    
+                case PacketTypes.Room.GameStartPacket:
+                    Debug.Log("recive Game start packet");
+                    packet = new GameStartPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    scriptNow = (WaitingRoomScript)_uiScripts;
+                    scriptNow.LoadMap();
+                    scriptNow.SendStartGameInBattle((GameStartPacket)packet);
+                    break;
             }
         }
 
@@ -250,6 +372,7 @@ namespace NetworkThread.Multiplayer
         public void DiscoveryServer()
         {
             client.DiscoverLocalPeers(14242);
+            /*client.Connect()*/
         }
         
         
@@ -548,12 +671,12 @@ namespace NetworkThread.Multiplayer
             client.FlushSendQueue();
         }
 
-        public void SendStartGamePacket(int roomId)
+        public void SendStartGamePacket()
         {
             NetOutgoingMessage message = client.CreateMessage();
             new StartGamePacket()
             {
-                roomId = roomId,
+                
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
