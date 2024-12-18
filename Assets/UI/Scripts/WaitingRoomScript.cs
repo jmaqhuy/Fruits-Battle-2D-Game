@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using Unity.VisualScripting;
-
+using System.Threading.Tasks;
 public class WaitingRoomScript : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -64,7 +64,7 @@ public class WaitingRoomScript : MonoBehaviour
         Item1.onClick.AddListener(() => OnItemClick(1));
         Item2.onClick.AddListener(() => OnItemClick(2));
         ReadyButton.onClick.AddListener(PlayerReadyClick);
-        StartButton.onClick.AddListener(StartGameButtonClick);
+        StartButton.onClick.AddListener(SendStartGame);
     }
 
     private void StartGameButtonClick()
@@ -108,7 +108,7 @@ public class WaitingRoomScript : MonoBehaviour
             StartCoroutine(ShowErrorPanel("The number of players on both teams is not balanced."));
             return;
         }
-        NetworkStaticManager.ClientHandle.SendStartGamePacket(_intRoomId);
+        NetworkStaticManager.ClientHandle.SendStartGamePacket();
     }
 
     private IEnumerator ShowErrorPanel(string message)
@@ -265,5 +265,21 @@ public class WaitingRoomScript : MonoBehaviour
             ReadyButton.GetComponent<Image>().color = new Color32(0, 135, 10, 255);
             ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready";
         }
+    }
+    public async void SendStartGameInBattle(GameStartPacket packet)
+
+    {
+        GameStartPacket same = packet;
+
+        await Task.Delay(2000);
+        if (packet.isHost && packet.username == NetworkStaticManager.ClientHandle.GetUsername()) { NetworkStaticManager.ClientHandle.StartGameInBattle(); }
+        else
+        {
+            Debug.Log(NetworkStaticManager.ClientHandle.GetUsername() + " " + packet.username + " " + packet.isHost);
+        }
+    }
+    public void SendStartGame()
+    {
+        NetworkStaticManager.ClientHandle.StartGame();
     }
 }
