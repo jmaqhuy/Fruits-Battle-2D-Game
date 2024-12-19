@@ -12,12 +12,17 @@ using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameBattle : MonoBehaviour
 {
     [Header("Battle Information")]
     public TextMeshProUGUI TimeText;
-    
+
+    [Header("End Game Panel")]
+    public GameObject EndGamePanel;
+    public TextMeshProUGUI EndText;
+
     public GameObject playerPrefab;
     public GameObject bulletPrefab;
     public Quaternion quaternion;
@@ -54,19 +59,26 @@ public class GameBattle : MonoBehaviour
 
     public void EndGame(EndGamePacket packet)
     {
-        Unit script = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponent<Unit>();
-        if (packet.TeamWin == "Team1" && script.getTeam() == Team.Team1)
+        if(packet.TeamWin == _myTeam)
         {
-            Debug.Log("You Win");
-        }
-        else if(packet.TeamWin == "Team2" && script.getTeam() == Team.Team2)
-        {
-            Debug.Log("You Win");
+            EndText.text = "Victory";
+            
+
         }
         else
         {
-            Debug.Log("You Lose");
+            EndText.text = "Defeat";
         }
+        MonoBehaviour[] components = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour component in components)
+        {
+            Destroy(component);
+        }
+        EndGamePanel.SetActive(true);
+    }
+    public void BackToRoom()
+    {
+        SceneManager.LoadScene("Waiting Room");
     }
 
     private IEnumerator Clock(int start)
@@ -165,7 +177,7 @@ public class GameBattle : MonoBehaviour
 
         }
         focusCamera.Follow = Players[packet.playerName].transform;
-        clockCoroutine = StartCoroutine(Clock(10));
+        clockCoroutine = StartCoroutine(Clock(20));
         _currentPlayerName = Players[packet.playerName].GetComponent<Unit>().nameText.gameObject;
         blinkNameCoroutine = StartCoroutine(BlinkName(_currentPlayerName));
 
@@ -213,6 +225,11 @@ public class GameBattle : MonoBehaviour
             mainBullet.setTeam(script.getTeam());
             mainBullet.setDamage(script.getAttack());
 
+        }
+        if (clockCoroutine != null)
+        {
+            StopCoroutine(clockCoroutine);
+            clockCoroutine = null;
         }
     }
     public void UpdatePosition(PositionPacket packet)

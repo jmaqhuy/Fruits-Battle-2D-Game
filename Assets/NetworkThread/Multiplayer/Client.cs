@@ -380,8 +380,8 @@ namespace NetworkThread.Multiplayer
 
         public void DiscoveryServer()
         {
-            /*client.DiscoverLocalPeers(14242);*/
-            client.Connect("35.232.232.21", 14242);
+            client.DiscoverLocalPeers(14242);
+            //client.Connect("35.232.232.21", 14242);
         }
         
         
