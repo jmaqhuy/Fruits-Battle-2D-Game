@@ -32,4 +32,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Maps/Normal Mode Map.unity
     guid: 463306cd54b6e4842a00067a54107408
+  - enabled: 1
+    path: Assets/Scenes/ChangePassword.unity
+    guid: e20f7464730002b439ad9e974af2b7e6
   m_configObjects: {}

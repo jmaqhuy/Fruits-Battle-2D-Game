@@ -4443,7 +4443,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1024298547}
         m_TargetAssemblyTypeName: CharacterManageUIScript, Assembly-CSharp
+<<<<<<< HEAD
         m_MethodName: BackToMainMenu
+=======
+        m_MethodName: backButtonClicked
+>>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

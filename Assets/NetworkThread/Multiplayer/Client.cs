@@ -671,6 +671,23 @@ namespace NetworkThread.Multiplayer
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
+        public void SendChangePasswordPacket(string userName, string oldPass, string newPass, string confirmPass)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new ChangePassword()
+            {
+                username = userName,
+                oldPassword = oldPass,
+                newPass = newPass,
+                confirmPass = confirmPass,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            
+            Debug.Log("Sending PassWord package to server");
+        }
+        
+        
 
         public void SendStartGamePacket(int rId)
         {
@@ -707,6 +724,10 @@ namespace NetworkThread.Multiplayer
             else if (_uiScripts is MainMenu)
             {
                 Debug.Log("Script hiện tại là MainMenu");
+            }
+            else if(_uiScripts is global::ChangePassword)
+            {
+                Debug.Log("Here is ChangePassword script");
             }
             else
             {
