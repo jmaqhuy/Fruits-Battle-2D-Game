@@ -316,6 +316,41 @@ namespace NetworkThread.Multiplayer
                     scriptNow = (FriendSceneScript)_uiScripts;
                     scriptNow.AfterAddFriend((AddFriendPacket)packet);
                     break;
+                case PacketTypes.Friend.DeleteFriend:
+                    packet = new DeleteFriend();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Delete friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterDeleteFriend((DeleteFriend)packet);
+                    break;
+                case PacketTypes.Friend.AcceptFriendInvite:
+                    packet = new AcceptFriendInvite();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Accept friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterAcceptFriend((AcceptFriendInvite)packet);
+                    break;
+                case PacketTypes.Friend.CancelFriendRequest:
+                    packet = new CancelFriendRequest();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Cancel friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterCancelRequest((CancelFriendRequest)packet);
+                    break;
+                case PacketTypes.Friend.BlockFriend:
+                    packet = new BlockFriend();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Accept friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterBlockFriend((BlockFriend)packet);
+                    break;
+                case PacketTypes.Friend.UnBlockFriend:
+                    packet = new UnBlockFriend();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Unblock friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterUnlockFriend((UnBlockFriend)packet);
+                    break;
                 default:
                     Debug.Log("Unhandled message type");
                     break;
@@ -420,11 +455,11 @@ namespace NetworkThread.Multiplayer
 
         public void DiscoveryServer()
         {
-            /*client.DiscoverLocalPeers(14242);*/
-            client.Connect("35.232.232.21", 14242);
+            client.DiscoverLocalPeers(14242);
+            //client.Connect("35.232.232.21", 14242);
         }
-        
-        
+
+
         private void HandleShopPacket(PacketTypes.Shop type, NetIncomingMessage message)
         {
             
@@ -744,7 +779,9 @@ namespace NetworkThread.Multiplayer
             NetOutgoingMessage message = client.CreateMessage();
             new SearchPlayerPacket()
             {
-                username = playername,
+                username1 = _username,
+                username2 = playername
+
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
@@ -753,6 +790,61 @@ namespace NetworkThread.Multiplayer
         {
             NetOutgoingMessage message = client.CreateMessage();
             new AddFriendPacket()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendDeleteFriend(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new DeleteFriend()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendAcceptFriendInvite(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new AcceptFriendInvite()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendCancelFriendRequest(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new CancelFriendRequest()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendBlockFriend(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new BlockFriend()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendUnBlockFriend(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new UnBlockFriend()
             {
                 username1 = _username,
                 username2 = playername,

@@ -17,4 +17,8 @@ public class FriendInFriendList : MonoBehaviour
     {
         this.username = username;
     }
+    public string GetUserName()
+    {
+        return this.username;
+    }
 }

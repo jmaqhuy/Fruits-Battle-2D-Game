@@ -46,7 +46,9 @@ public class FriendSceneScript : MonoBehaviour
     public RectTransform BlockFriendTabRect;
     [FormerlySerializedAs("FriendResultPrefab")] public GameObject BlockFriendPrefab;
 
-
+    [Header("Prefabs")]
+    public GameObject UserProfilePrefab;
+    private string NameToRemove;
     private List<GameObject> PreFabs;
     private Dictionary<Button, GameObject> buttonTabMap;
     private List<GameObject> _queryResults = new List<GameObject>();
@@ -55,7 +57,7 @@ public class FriendSceneScript : MonoBehaviour
 
     void Awake()
     {
-        //NetworkStaticManager.ClientHandle.SetUiScripts(this);
+        NetworkStaticManager.ClientHandle.SetUiScripts(this);
     }
 
     // Start is called before the first frame update
@@ -209,9 +211,8 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowInfo(f.FriendUsername));
-            tabInfo.GetComponent<FriendInFriendList>().DeleteFriendButton.onClick.AddListener(() => DeleteFriend(f.FriendUsername));
-
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().DeleteFriendButton.onClick.AddListener(() => RemoveFriend(f.FriendUsername));
         }
     }
     public void ParseFriendRequestInfo(FriendRequestPacket packet)
@@ -226,8 +227,8 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowInfo(f.FriendUsername));
-            tabInfo.GetComponent<FriendInFriendList>().ConfirmFriendButton.onClick.AddListener(() => ConfirmFriend(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ConfirmFriendButton.onClick.AddListener(() => AcceptFriendRequest(f.FriendUsername));
         }
     }
     public void ParseSentFriendInfo(SentRequestPacket packet)
@@ -242,8 +243,8 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowInfo(f.FriendUsername));
-            tabInfo.GetComponent<FriendInFriendList>().CancelRequestButton.onClick.AddListener(() => CancelRequest(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().CancelRequestButton.onClick.AddListener(() => CancelFriendRequest(f.FriendUsername));
         }
     }
     public void ParseSuggestFriendInfo(SuggestFriendPacket packet)
@@ -252,29 +253,31 @@ public class FriendSceneScript : MonoBehaviour
         Debug.Log(suggestedFriends.Count + " User Found");
         foreach (var f in packet.Friends)
         {
-            GameObject friend = Instantiate(SuggestResultPrefab, FriendRequestTabRect);
+            GameObject friend = Instantiate(SuggestResultPrefab, SearchTabRect);
             friend.SetActive(true);
             _queryResults.Add(friend);
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowInfo(f.FriendUsername));
-            tabInfo.GetComponent<FriendInFriendList>().AddFriendButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendAddFriendPacket(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().AddFriendButton.onClick.AddListener(() => AddFriend(f.FriendUsername));
         }
     }
     public void ParseSearchedFriendInfo(SearchPlayerPacket packet)
     {
-        FriendTabPacket allFriends = packet.Friend;
-        Debug.Log("User Found");
-            GameObject friend = Instantiate(SuggestResultPrefab, FriendRequestTabRect);
+        List<FriendTabPacket> SearchedFriend = packet.Friends;
+        Debug.Log(SearchedFriend.Count + " User Found");
+        foreach (var f in packet.Friends)
+        {
+            GameObject friend = Instantiate(SuggestResultPrefab, SearchTabRect);
             friend.SetActive(true);
             _queryResults.Add(friend);
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
-            tabInfo.SetUserName(packet.Friend.FriendUsername);
-            tabInfo.DisplayName.text = packet.Friend.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowInfo(packet.Friend.FriendUsername));
-            tabInfo.GetComponent<FriendInFriendList>().AddFriendButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendAddFriendPacket(packet.Friend.FriendUsername));
-
+            tabInfo.SetUserName(f.FriendUsername);
+            tabInfo.DisplayName.text = f.FriendDisplayName;
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().AddFriendButton.onClick.AddListener(() => AddFriend(f.FriendUsername));
+        }
     }
     public void ParseBlockFriendInfo(BlockFriendPacket packet)
     {
@@ -288,32 +291,99 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowInfo(f.FriendUsername));
-            tabInfo.GetComponent<FriendInFriendList>().UnlockFriendButton.onClick.AddListener(() => UnlockFriend(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().UnlockFriendButton.onClick.AddListener(() => UnBlockFriend(f.FriendUsername));
         }
     }
-    private void ShowInfo(string player)
+    private void AddFriend(string username)
     {
-
+        NetworkStaticManager.ClientHandle.SendAddFriendPacket(username);
+        NameToRemove = username;
+    }
+    private void RemoveFriend(string username)
+    {
+        NetworkStaticManager.ClientHandle.SendDeleteFriend(username);
+        NameToRemove = username;
+    }
+    private void AcceptFriendRequest(string username)
+    {
+        NetworkStaticManager.ClientHandle.SendAcceptFriendInvite(username);
+        NameToRemove = username;
+    }
+    private void CancelFriendRequest(string username)
+    {
+        NetworkStaticManager.ClientHandle.SendCancelFriendRequest(username);
+        NameToRemove = username;
+    }
+    private void BlockFriend(string username)
+    {
+        NetworkStaticManager.ClientHandle.SendBlockFriend(username);
+        NameToRemove = username;
+    }
+    private void UnBlockFriend(string username)
+    {
+        NetworkStaticManager.ClientHandle.SendUnBlockFriend(username);
+        NameToRemove = username;
     }
 
-    private void DeleteFriend(string player)
+    public void ShowUserProfile(string player)
     {
-
     }
-    private void ConfirmFriend(string player)
+    private void RemoveOnePrefab()
     {
-
+        for (int i = 0;i<_queryResults.Count;i++) 
+        {
+            if (_queryResults[i].GetComponent<FriendInFriendList>().GetUserName() == NameToRemove)
+            {
+                Destroy(_queryResults[i]);
+                _queryResults.Remove(_queryResults[i]);
+            }
+        }
     }
-    private void CancelRequest(string player)
+    public void AfterDeleteFriend(DeleteFriend packet)
     {
+        if (packet.IsSuccess)
+        {
+            Debug.Log("Delete friend successfull");
+            RemoveOnePrefab();
+        }
+        else
+        {
+            Debug.Log("Delete friend not successfull");
+        }
+    }
+    public void AfterAcceptFriend(AcceptFriendInvite packet)
+    {
+        if (packet.IsSuccess)
+        {
+            Debug.Log("Accept friend successfull");
+            RemoveOnePrefab();
+        }
+        else
+        {
+            Debug.Log("Accept friend not successfull");
 
+        }
+    }
+    public void AfterCancelRequest(CancelFriendRequest packet)
+    {
+        if (packet.IsSuccess)
+        {
+            Debug.Log("Cancel friend successfull");
+            RemoveOnePrefab();
+        }
+        else
+        {
+            Debug.Log("Cancel friend not successfull");
+
+        }
     }
     public void AfterAddFriend(AddFriendPacket packet)
     {
         if (packet.IsSuccess)
         {
             Debug.Log("Add friend successfull");
+            RemoveOnePrefab();
         }
         else
         {
@@ -321,8 +391,30 @@ public class FriendSceneScript : MonoBehaviour
 
         }
     }
-    private void UnlockFriend(string player)
+    public void AfterBlockFriend(BlockFriend packet)
     {
+        if (packet.IsSuccess)
+        {
+            Debug.Log("Block friend successfull");
+            RemoveOnePrefab();
+        }
+        else
+        {
+            Debug.Log("Block friend not successfull");
 
+        }
+    }
+    public void AfterUnlockFriend(UnBlockFriend packet)
+    {
+        if (packet.IsSuccess)
+        {
+            Debug.Log("Unlock friend successfull"); 
+            RemoveOnePrefab();
+        }
+        else
+        {
+            Debug.Log("Unlock friend not successfull");
+
+        }
     }
 }
