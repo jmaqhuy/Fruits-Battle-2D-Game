@@ -78,7 +78,7 @@ public class ChangePassword : MonoBehaviour
         else
         {
             NetworkStaticManager.ClientHandle.SendChangePasswordPacket(username,oldPass, newPass, confirm);
-            ShowLoadingPanel("Change Password");
+           SceneManager.LoadScene("Main Menu");
         }
     }
     
