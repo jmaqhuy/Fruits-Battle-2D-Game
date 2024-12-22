@@ -67,7 +67,8 @@ namespace NetworkThread.Multiplayer
             AcceptFriendInvite,
             CancelFriendRequest,
             BlockFriend,
-            UnBlockFriend
+            UnBlockFriend,
+            FriendUserProfilePacket
         }
 
         public enum Character : byte
@@ -541,6 +542,21 @@ namespace NetworkThread.Multiplayer
             {
                 Friends.Add(FriendTabPacket.Deserialize(message));
             }
+        }
+    }
+    public class FriendUserProfilePacket : Packet
+    {
+        public string username { get; set; }
+        public FriendTabPacket Friend { get; set; }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Friend.FriendUserProfilePacket);
+            message.Write(username);        
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            Friend = FriendTabPacket.Deserialize(message);
         }
     }
     public class AddFriendPacket : Packet

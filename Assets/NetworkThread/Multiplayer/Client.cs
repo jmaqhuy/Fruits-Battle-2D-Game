@@ -351,6 +351,13 @@ namespace NetworkThread.Multiplayer
                     scriptNow = (FriendSceneScript)_uiScripts;
                     scriptNow.AfterUnlockFriend((UnBlockFriend)packet);
                     break;
+                case PacketTypes.Friend.FriendUserProfilePacket:
+                    packet = new FriendUserProfilePacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("FriendUserProfilePacket received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ChangeFriendUserProfile((FriendUserProfilePacket)packet);
+                    break;
                 default:
                     Debug.Log("Unhandled message type");
                     break;
@@ -781,6 +788,17 @@ namespace NetworkThread.Multiplayer
             {
                 username1 = _username,
                 username2 = playername
+
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendFriendUserProfilePacket(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new FriendUserProfilePacket()
+            {
+                username = playername
 
             }.PacketToNetOutGoingMessage(message);
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);

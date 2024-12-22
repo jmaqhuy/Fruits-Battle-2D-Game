@@ -211,7 +211,7 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendFriendUserProfilePacket(f.FriendUsername));
             tabInfo.GetComponent<FriendInFriendList>().DeleteFriendButton.onClick.AddListener(() => RemoveFriend(f.FriendUsername));
         }
     }
@@ -227,7 +227,7 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendFriendUserProfilePacket(f.FriendUsername));
             tabInfo.GetComponent<FriendInFriendList>().ConfirmFriendButton.onClick.AddListener(() => AcceptFriendRequest(f.FriendUsername));
         }
     }
@@ -243,7 +243,7 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendFriendUserProfilePacket(f.FriendUsername));
             tabInfo.GetComponent<FriendInFriendList>().CancelRequestButton.onClick.AddListener(() => CancelFriendRequest(f.FriendUsername));
         }
     }
@@ -259,7 +259,7 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendFriendUserProfilePacket(f.FriendUsername));
             tabInfo.GetComponent<FriendInFriendList>().AddFriendButton.onClick.AddListener(() => AddFriend(f.FriendUsername));
         }
     }
@@ -275,7 +275,7 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendFriendUserProfilePacket(f.FriendUsername));
             tabInfo.GetComponent<FriendInFriendList>().AddFriendButton.onClick.AddListener(() => AddFriend(f.FriendUsername));
         }
     }
@@ -291,9 +291,14 @@ public class FriendSceneScript : MonoBehaviour
             FriendInFriendList tabInfo = friend.GetComponent<FriendInFriendList>();
             tabInfo.SetUserName(f.FriendUsername);
             tabInfo.DisplayName.text = f.FriendDisplayName;
-            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => ShowUserProfile(f.FriendUsername));
+            tabInfo.GetComponent<FriendInFriendList>().ShowInfoButton.onClick.AddListener(() => NetworkStaticManager.ClientHandle.SendFriendUserProfilePacket(f.FriendUsername));
             tabInfo.GetComponent<FriendInFriendList>().UnlockFriendButton.onClick.AddListener(() => UnBlockFriend(f.FriendUsername));
         }
+    }
+    public void ChangeFriendUserProfile(FriendUserProfilePacket packet)
+    {
+        UserProfilePrefab.SetActive(true) ;
+        UserProfilePrefab.GetComponent<UserProfileInFriendList>().DisplayName.text = packet.Friend.FriendDisplayName;
     }
     private void AddFriend(string username)
     {
@@ -326,9 +331,7 @@ public class FriendSceneScript : MonoBehaviour
         NameToRemove = username;
     }
 
-    public void ShowUserProfile(string player)
-    {
-    }
+
     private void RemoveOnePrefab()
     {
         for (int i = 0;i<_queryResults.Count;i++) 

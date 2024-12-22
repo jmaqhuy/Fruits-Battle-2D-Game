@@ -18,7 +18,7 @@ namespace NetworkThread.Multiplayer.Packets
             return new FriendTabPacket()
             {
                 FriendUsername = message.ReadString(),
-                FriendDisplayName = message.ReadString()
+                FriendDisplayName = message.ReadString(),
             };
         }
     }
