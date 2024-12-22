@@ -747,10 +747,10 @@ namespace NetworkThread.Multiplayer
     }
     public class EndGamePacket : Packet
     {
-        public string TeamWin {  get; set; }
+        public Team TeamWin {  get; set; }
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            TeamWin = message.ReadString();
+            TeamWin = (Team)message.ReadByte();
         }
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {

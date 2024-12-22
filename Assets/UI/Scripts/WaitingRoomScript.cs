@@ -51,6 +51,7 @@ public class WaitingRoomScript : MonoBehaviour
     private bool _isReady = false;
     [Header("Error Panel")]
     public GameObject errorPanel;
+    int counter = 0;
 
     void Awake()
     {
@@ -63,6 +64,7 @@ public class WaitingRoomScript : MonoBehaviour
     {
         if (roomData.RoomPacket != null)
         {
+            Debug.Log($"Exist room Data. Number player in room: {roomData.PlayersInRoom.Count}");
             PasteRoomInfo(roomData.RoomPacket);
             SetUIForAll(roomData.PlayersInRoom);
         }
@@ -238,6 +240,8 @@ public class WaitingRoomScript : MonoBehaviour
     }
     public void SetUIForAll(List<PlayerInRoomPacket> players)
     {
+        
+        Debug.Log($"Set UI {++counter} Time");
         HideAllPlayers(playerList);
         
         foreach (var player in players)
