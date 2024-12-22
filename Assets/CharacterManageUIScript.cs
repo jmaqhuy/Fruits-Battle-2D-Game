@@ -6,10 +6,8 @@ using NetworkThread;
 using NetworkThread.Multiplayer.Packets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-<<<<<<< HEAD
-=======
 using UnityEngine.UIElements;
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
+
 
 public class CharacterManageUIScript : MonoBehaviour
 {
@@ -21,10 +19,9 @@ public class CharacterManageUIScript : MonoBehaviour
     public GameObject SelectCharacterPanel;
     public SelectCharacterTabScript SelectCharacterTabScript;
     
-<<<<<<< HEAD
+
     public CharactersData CharactersData;
-=======
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
+
     
     private Animator _animator;
     

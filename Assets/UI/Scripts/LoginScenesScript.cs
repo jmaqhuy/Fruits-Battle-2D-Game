@@ -84,25 +84,23 @@ public class LoginScenesScript : MonoBehaviour
 
     void Start()
     {
-<<<<<<< HEAD
-=======
+
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         for (int i = 0; i < digits.Length; i++)
         {
             int index = i; // Lưu chỉ số hiện tại (để tránh lỗi closure)
             digits[i].onValueChanged.AddListener((text) => OnInputChanged(index, text));
         }
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
+
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         for (int i = 0; i < digits.Length; i++)
         {
             int index = i;
             digits[i].onValueChanged.AddListener((text) => OnInputChanged(index, text));
         }
-<<<<<<< HEAD
+
         loadingText.text = "";
-=======
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
+
         ShowLoginPanel();
     }
     

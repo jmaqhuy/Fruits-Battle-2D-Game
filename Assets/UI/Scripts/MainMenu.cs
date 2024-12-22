@@ -21,14 +21,14 @@ public class MainMenu : MonoBehaviour
 
     [Header("Change Display Name Panel")]
     public GameObject changeDisplayNamePanel;
-<<<<<<< HEAD
+
     public Button closeButton;
     public TMP_InputField newDisplayName;
     public Button acceptButton;
-=======
+
 
    
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
+
     // Start is called before the first frame update
 
     void Awake()
@@ -39,11 +39,10 @@ public class MainMenu : MonoBehaviour
     
     void Start()
     {
-<<<<<<< HEAD
         acceptButton.onClick.AddListener(OnChangeDisplayNameButtonClicked);
         SetCoinsTMP(userData.UserInfo.coin);
         if ( string.IsNullOrEmpty(userData.UserInfo.displayName))
-=======
+
         NetworkStaticManager.ClientHandle.GetScriptNameNow();
         NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
     }
@@ -51,17 +50,15 @@ public class MainMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if (firstTime)
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
-        {
-            ShowChangeDisplayNamePanel(false);
-        }
-        else
-        {
-            SetDisplayNameTMP(userData.UserInfo.displayName);
-            HideChangeDisplayNamePanel();
-            
-        }
+        // if (firstTime)
+        // {
+        //     ShowChangeDisplayNamePanel(false);
+        // }
+        // else
+        // {
+        //     SetDisplayNameTMP(userData.UserInfo.displayName);
+        //     HideChangeDisplayNamePanel();
+        // }
     }
     private void OnChangeDisplayNameButtonClicked()
     {
@@ -126,8 +123,6 @@ public class MainMenu : MonoBehaviour
     {
         changeDisplayNamePanel.SetActive(false);
     }
-<<<<<<< HEAD
-=======
 
     public GameObject GetChangeDisplayNamePanel()
     {
@@ -145,5 +140,5 @@ public class MainMenu : MonoBehaviour
         NetworkStaticManager.ClientHandle.SendLogoutPacket();
         SceneManager.LoadScene("Login");
     }
->>>>>>> c98d221 (Make ChangePassWord scene and add MusicBackGround. One thing more, add button setting.)
+
 }
