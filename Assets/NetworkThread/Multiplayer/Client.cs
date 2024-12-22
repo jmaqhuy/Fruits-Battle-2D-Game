@@ -267,15 +267,97 @@ namespace NetworkThread.Multiplayer
                     }
 
                     break;*/
+                case PacketTypes.Friend.SearchFriendPacket:
+                    packet = new SearchPlayerPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Searched friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ParseSearchedFriendInfo((SearchPlayerPacket)packet);
+                    break;
+                case PacketTypes.Friend.AllFriendPacket:
+                    packet = new AllFriendPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("All friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ParseAllFriendInfo((AllFriendPacket)packet);
+                    break;
+                case PacketTypes.Friend.FriendRequestPacket:
+                    packet = new FriendRequestPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Friend request packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ParseFriendRequestInfo((FriendRequestPacket)packet);
+                    break;
+                case PacketTypes.Friend.SentRequestPacket:
+                    packet = new SentRequestPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Sent friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ParseSentFriendInfo((SentRequestPacket)packet);
+                    break;
                 case PacketTypes.Friend.SuggestFriendPacket:
                     packet = new SuggestFriendPacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("Suggest friend packet received from server");
                     scriptNow = (FriendSceneScript)_uiScripts;
                     scriptNow.ParseSuggestFriendInfo((SuggestFriendPacket)packet);
-                    
                     break;
-                    
+                case PacketTypes.Friend.BlockFriendPacket:
+                    packet = new BlockFriendPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Block friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ParseBlockFriendInfo((BlockFriendPacket)packet);
+                    break;
+                case PacketTypes.Friend.AddFriendPacket:
+                    packet = new AddFriendPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Add friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterAddFriend((AddFriendPacket)packet);
+                    break;
+                case PacketTypes.Friend.DeleteFriend:
+                    packet = new DeleteFriend();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Delete friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterDeleteFriend((DeleteFriend)packet);
+                    break;
+                case PacketTypes.Friend.AcceptFriendInvite:
+                    packet = new AcceptFriendInvite();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Accept friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterAcceptFriend((AcceptFriendInvite)packet);
+                    break;
+                case PacketTypes.Friend.CancelFriendRequest:
+                    packet = new CancelFriendRequest();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Cancel friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterCancelRequest((CancelFriendRequest)packet);
+                    break;
+                case PacketTypes.Friend.BlockFriend:
+                    packet = new BlockFriend();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Accept friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterBlockFriend((BlockFriend)packet);
+                    break;
+                case PacketTypes.Friend.UnBlockFriend:
+                    packet = new UnBlockFriend();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Unblock friend packet received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.AfterUnlockFriend((UnBlockFriend)packet);
+                    break;
+                case PacketTypes.Friend.FriendUserProfilePacket:
+                    packet = new FriendUserProfilePacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("FriendUserProfilePacket received from server");
+                    scriptNow = (FriendSceneScript)_uiScripts;
+                    scriptNow.ChangeFriendUserProfile((FriendUserProfilePacket)packet);
+                    break;
                 default:
                     Debug.Log("Unhandled message type");
                     break;
@@ -383,8 +465,8 @@ namespace NetworkThread.Multiplayer
             client.DiscoverLocalPeers(14242);
             //client.Connect("35.232.232.21", 14242);
         }
-        
-        
+
+
         private void HandleShopPacket(PacketTypes.Shop type, NetIncomingMessage message)
         {
             
@@ -659,7 +741,135 @@ namespace NetworkThread.Multiplayer
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
+        public void SendAllFriendPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new AllFriendPacket()
+            {
+                username = _username,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendFriendRequestPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new FriendRequestPacket()
+            {
+                username = _username,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendSentRequestPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new SentRequestPacket()
+            {
+                username = _username,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendBlockFriendPacket()
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new BlockFriendPacket()
+            {
+                username = _username,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendSearchPlayerPacket(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new SearchPlayerPacket()
+            {
+                username1 = _username,
+                username2 = playername
 
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendFriendUserProfilePacket(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new FriendUserProfilePacket()
+            {
+                username = playername
+
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendAddFriendPacket(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new AddFriendPacket()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendDeleteFriend(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new DeleteFriend()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendAcceptFriendInvite(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new AcceptFriendInvite()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendCancelFriendRequest(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new CancelFriendRequest()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendBlockFriend(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new BlockFriend()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void SendUnBlockFriend(string playername)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new UnBlockFriend()
+            {
+                username1 = _username,
+                username2 = playername,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
         public void SendResetPasswordPacket(string username, string email)
         {
             NetOutgoingMessage message = client.CreateMessage();
