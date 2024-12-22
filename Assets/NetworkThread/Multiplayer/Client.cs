@@ -731,6 +731,21 @@ namespace NetworkThread.Multiplayer
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
+        public void SendChangePasswordPacket(string userName, string oldPass, string newPass, string confirmPass)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new ChangePassword()
+            {
+                username = userName,
+                oldPassword = oldPass,
+                newPass = newPass,
+                confirmPass = confirmPass,
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+            
+            Debug.Log("Sending PassWord package to server");
+        }
         public void SendSuggestFriendPacket()
         {
             NetOutgoingMessage message = client.CreateMessage();
