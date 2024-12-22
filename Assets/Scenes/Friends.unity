@@ -5495,7 +5495,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1982946878}
         m_TargetAssemblyTypeName: FriendSceneScript, Assembly-CSharp
         m_MethodName: GoBack
         m_Mode: 1
