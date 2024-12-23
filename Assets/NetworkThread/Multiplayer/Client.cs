@@ -562,7 +562,22 @@ namespace NetworkThread.Multiplayer
                         ((LoginScenesScript)_uiScripts).ResetPasswordFail(((ResetPassword)packet).reason);
                     }
                     break;
-                
+                case PacketTypes.General.ChangePassword:
+                    Debug.Log("Type: Received ChangePassword Packet");
+                    
+                    packet = new ChangePassword();
+                    packet.NetIncomingMessageToPacket(message);
+                    var changePass = (global::ChangePassword)_uiScripts;
+                    if (((ChangePassword)packet).isSuccess)
+                    {
+                        changePass.ShowChangePasswordDone();
+                    }
+                    else
+                    {
+                        changePass.ShowChangePasswordFailed();
+                    }
+                    
+                    break;
                 case PacketTypes.General.VerifyRegistrationPacket:
                     Debug.Log("Type: Received VerifyRegistration Packet");
                     packet = new VerifyRegistrationPacket();

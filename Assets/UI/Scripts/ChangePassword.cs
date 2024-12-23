@@ -73,9 +73,15 @@ public class ChangePassword : MonoBehaviour
     {
         errorText.text = forgotError;
     }
-   
 
-   
+    public void ShowChangePasswordDone()
+    {
+        errorText.text = "Change Password Done, you can close this window";
+    }
 
+    public void ShowChangePasswordFailed()
+    {
+        errorText.text = "Old Password Wrong, please try again";
+    }
     
 }
