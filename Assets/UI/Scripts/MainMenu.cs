@@ -21,9 +21,14 @@ public class MainMenu : MonoBehaviour
 
     [Header("Change Display Name Panel")]
     public GameObject changeDisplayNamePanel;
+
     public Button closeButton;
     public TMP_InputField newDisplayName;
     public Button acceptButton;
+
+
+   
+
     // Start is called before the first frame update
 
     void Awake()
@@ -37,15 +42,23 @@ public class MainMenu : MonoBehaviour
         acceptButton.onClick.AddListener(OnChangeDisplayNameButtonClicked);
         SetCoinsTMP(userData.UserInfo.coin);
         if ( string.IsNullOrEmpty(userData.UserInfo.displayName))
-        {
-            ShowChangeDisplayNamePanel(false);
-        }
-        else
-        {
-            SetDisplayNameTMP(userData.UserInfo.displayName);
-            HideChangeDisplayNamePanel();
-            
-        }
+
+        NetworkStaticManager.ClientHandle.GetScriptNameNow();
+        NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        // if (firstTime)
+        // {
+        //     ShowChangeDisplayNamePanel(false);
+        // }
+        // else
+        // {
+        //     SetDisplayNameTMP(userData.UserInfo.displayName);
+        //     HideChangeDisplayNamePanel();
+        // }
     }
     private void OnChangeDisplayNameButtonClicked()
     {
@@ -105,4 +118,22 @@ public class MainMenu : MonoBehaviour
     {
         changeDisplayNamePanel.SetActive(false);
     }
+
+    public GameObject GetChangeDisplayNamePanel()
+    {
+        return changeDisplayNamePanel;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+        Debug.Log("Quit");
+    }
+
+    public void ExitAcount()
+    {
+        NetworkStaticManager.ClientHandle.SendLogoutPacket();
+        SceneManager.LoadScene("Login");
+    }
+
 }
