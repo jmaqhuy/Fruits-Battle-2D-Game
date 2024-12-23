@@ -572,7 +572,7 @@ namespace NetworkThread.Multiplayer
                     {
                         changePass.ShowChangePasswordDone();
                     }
-                    else
+                    else 
                     {
                         changePass.ShowChangePasswordFailed();
                     }
