@@ -8371,6 +8371,7 @@ MonoBehaviour:
   confirmPassword: {fileID: 787886435}
   errorText: {fileID: 1077770761}
   changePasswordButton: {fileID: 143871182}
+  settingsPanel: {fileID: 2673393}
 --- !u!1 &1782000216
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,6 +16,7 @@ public class ChangePassword : MonoBehaviour
     public TextMeshProUGUI errorText;
     public Button changePasswordButton;
     private string username;
+    public GameObject settingsPanel;
     private void Awake()
     {
         Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
@@ -65,7 +66,7 @@ public class ChangePassword : MonoBehaviour
         else
         {
             NetworkStaticManager.ClientHandle.SendChangePasswordPacket(username,oldPass, newPass, confirm);
-            
+            errorText.text = "";
         }
     }
     
@@ -76,12 +77,16 @@ public class ChangePassword : MonoBehaviour
 
     public void ShowChangePasswordDone()
     {
-        errorText.text = "Change Password Done, you can close this window";
+       gameObject.SetActive(false);
+       settingsPanel.SetActive(true);
     }
 
     public void ShowChangePasswordFailed()
     {
+        errorText.text = "";
         errorText.text = "Old Password Wrong, please try again";
+        oldPassword.text = "";
+        
     }
     
 }
