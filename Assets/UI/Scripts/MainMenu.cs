@@ -56,11 +56,11 @@ public class MainMenu : MonoBehaviour
         // }
         // else
         // {
-        //     SetDisplayNameTMP(userData.UserInfo.displayName);
+        // SetDisplayNameTMP(userData.UserInfo.displayName);
         //     HideChangeDisplayNamePanel();
         // }
     }
-    private void OnChangeDisplayNameButtonClicked()
+    public void OnChangeDisplayNameButtonClicked()
     {
         NetworkStaticManager.ClientHandle.SendChangeDisplayNamePacket(newDisplayName.text);
         SetDisplayNameTMP(newDisplayName.text);
