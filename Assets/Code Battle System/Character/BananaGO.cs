@@ -28,6 +28,7 @@ namespace Code_Battle_System.Character
         {
             GameObject fillImage = GameObject.Find("ForceBarFight");
             fill = fillImage.GetComponent<Image>();
+            fill.fillAmount = 0f;
             _calculateAngle = GetComponent<CalculateAngle>();
             animator = GetComponent<Animator>();
             isShoot = false;
