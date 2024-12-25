@@ -19,8 +19,8 @@ namespace Code_Battle_System.Character
         private Team playerTeam;
         public Slider healthSlider;
         public TextMeshProUGUI nameText;
+        public TextMeshProUGUI healthText;
         
-
 
         public void setAttack(int attack)
         {
@@ -44,14 +44,18 @@ namespace Code_Battle_System.Character
 
         public void setHealthCurrent(int health)
         {
+            
             this.HealthCurrent = health;
+            
             healthSlider.value = (float)this.HealthCurrent/(float)this.HeathMax;
+            healthText.text = this.HealthCurrent+"/"+this.HeathMax;
             if(health == 0 && this.unitName == NetworkStaticManager.ClientHandle.GetUsername())
             {
                 NetworkStaticManager.ClientHandle.SendPlayerDie(this.unitName);
             }
         }
 
+        
         public void setHealthMax(int health)
         {
             this.HeathMax = health;
@@ -70,27 +74,15 @@ namespace Code_Battle_System.Character
             return this.HealthCurrent;
         }
 
-        public int getHeathMax()
-        {
-            return this.HeathMax;
-        }
+        
 
         public string getUnitName()
         {
             return this.unitName;
         }
-        public void setHP()
-        {
-            healthSlider.value = HealthCurrent;
-            
-        }
+        
 
-        public void setHUD()
-        {
-            this.nameText.text = unitName;
-            healthSlider.maxValue = HeathMax;
-            
-        }
+       
         public void setIsLest(bool isLest) 
         {
             this.isLeft = isLest;
