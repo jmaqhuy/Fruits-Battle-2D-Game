@@ -22,10 +22,12 @@ public class GameBattle : MonoBehaviour
     [Header("End Game Panel")]
     public GameObject EndGamePanel;
     public TextMeshProUGUI EndText;
-
+    
+    [Header("Game Prefab")]
     public GameObject playerPrefab;
     public GameObject bulletPrefab;
-    public Quaternion quaternion;
+    public GameObject updateHpTextPrefab;
+    public Canvas canvas;
     public CinemachineVirtualCamera focusCamera;
     public GameObject characterController;
     // Ensure this is assigned in the Inspector
@@ -258,10 +260,25 @@ public class GameBattle : MonoBehaviour
     public void UpdateHP(HealthPointPacket packet)
     {
         Unit script = Players[packet.PlayerName].GetComponent<Unit>();
+        createUpdateHpText(packet.HP-script.getHealthCurrent(),Players[packet.PlayerName]);
         if (script != null)
         {
             script.setHealthCurrent(packet.HP);
         }
+    }
+    public void createUpdateHpText(int takeDamage,GameObject player)
+    {
+        string text = takeDamage.ToString();
+        Vector3 textPosition = new Vector3(player.transform.position.x, player.transform.position.y+3, player.transform.position.z);
+        if (updateHpTextPrefab != null)
+        {
+            Debug.Log("updateHpText spawn");
+            GameObject newText = (GameObject)Instantiate(updateHpTextPrefab, textPosition, Quaternion.identity);
+            newText.transform.GetComponent<TextMeshPro>().text = text;
+            newText.gameObject.SetActive(true);
+            // newText.transform.SetParent(canvas.transform, false);
+        }
+       
     }
     public void PlayerDie(PlayerDiePacket packet)
     {
