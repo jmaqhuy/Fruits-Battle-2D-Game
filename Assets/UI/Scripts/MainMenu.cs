@@ -42,25 +42,35 @@ public class MainMenu : MonoBehaviour
         acceptButton.onClick.AddListener(OnChangeDisplayNameButtonClicked);
         SetCoinsTMP(userData.UserInfo.coin);
         if ( string.IsNullOrEmpty(userData.UserInfo.displayName))
-
-        NetworkStaticManager.ClientHandle.GetScriptNameNow();
-        NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
+        {
+            ShowChangeDisplayNamePanel(false);
+        }
+        else
+        {
+            SetDisplayNameTMP(userData.UserInfo.displayName);
+            HideChangeDisplayNamePanel();
+            
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        // if (firstTime)
-        // {
-        //     ShowChangeDisplayNamePanel(false);
-        // }
-        // else
-        // {
-        //     SetDisplayNameTMP(userData.UserInfo.displayName);
-        //     HideChangeDisplayNamePanel();
-        // }
+        /*if (firstTime)
+        {
+            ShowChangeDisplayNamePanel(false);
+        }
+        else
+        {
+        SetDisplayNameTMP(userData.UserInfo.displayName);
+            HideChangeDisplayNamePanel();
+        }*/
+        // NetworkStaticManager.ClientHandle.SendChangeDisplayNamePacket(newDisplayName.text);
+        // SetDisplayNameTMP(newDisplayName.text);
+        // userData.UserInfo.displayName = newDisplayName.text;
+        // HideChangeDisplayNamePanel();
     }
-    private void OnChangeDisplayNameButtonClicked()
+    public void OnChangeDisplayNameButtonClicked()
     {
         NetworkStaticManager.ClientHandle.SendChangeDisplayNamePacket(newDisplayName.text);
         SetDisplayNameTMP(newDisplayName.text);
