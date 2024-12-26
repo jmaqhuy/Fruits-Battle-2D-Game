@@ -20,8 +20,8 @@ namespace Code_Battle_System.Character
         public Slider healthSlider;
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI healthText;
+        public Gradient gradientColor;
         
-
         public void setAttack(int attack)
         {
             this.Attack = attack;
@@ -46,9 +46,11 @@ namespace Code_Battle_System.Character
         {
             
             this.HealthCurrent = health;
-            
-            healthSlider.value = (float)this.HealthCurrent/(float)this.HeathMax;
+            float healthPercentage = (float)this.HealthCurrent/(float)this.HeathMax;
+            healthSlider.value =  healthPercentage;
             healthText.text = this.HealthCurrent+"/"+this.HeathMax;
+            healthSlider.fillRect.GetComponent<Image>().color = gradientColor.Evaluate(healthPercentage);
+
             if(health == 0 && this.unitName == NetworkStaticManager.ClientHandle.GetUsername())
             {
                 NetworkStaticManager.ClientHandle.SendPlayerDie(this.unitName);
