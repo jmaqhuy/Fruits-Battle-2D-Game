@@ -80,7 +80,7 @@ namespace Code_Battle_System.Character
         {
             return this.unitName;
         }
-        
+       
 
        
         public void setIsLest(bool isLest) 

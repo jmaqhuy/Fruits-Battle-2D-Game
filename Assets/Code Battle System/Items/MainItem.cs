@@ -29,30 +29,46 @@ namespace Code_Battle_System.Items
         public int ValueItem;
         public int Duration;
         public Target_type target_type;
-        
 
-       
 
-        public void Invisible()
+        private void Start()
         {
             if (effect_type == Effect_type.Invisibility)
             {
-                if (target_type == Target_type.Self)
+                Invisible();
+            }
+            else if (effect_type == Effect_type.Damage)
+            {
+                DamageOn();
+            }
+            else if (effect_type == Effect_type.Heal)
+            {
+                Healling();
+            }
+            else
+            {
+                ToxicOn();
+            }
+        }
+
+        public void Invisible()
+        {
+              if (target_type == Target_type.Self)
                 {
                     // Gửi thông tin rằng nhân vật tàng hình lên server tại đây.
+                    
                 }
 
                 if (target_type == Target_type.Teammate)
                 {
                     // Gửi thông tin rằng nhân vật và đồng đội tàng hình lên server tại đây.
                 }
-            }
+            
         }
 
         public void Healling()
         {
-            if (effect_type== Effect_type.Heal)
-            {
+            
                 if (target_type == Target_type.Self)
                 {
                     // Gửi thông tin rằng nhân vật hồi máu lên server tại đây.
@@ -63,13 +79,12 @@ namespace Code_Battle_System.Items
                     // Gửi thông tin rằng nhân vật và đồng đội hồi máu lên server tại đây.
                 }
                 
-            }
+            
         }
 
         public void ToxicOn()
         {
-            if (effect_type== Effect_type.Toxic)
-            {
+            
                 // Chưa rõ ý tưởng này có độc toàn bộ người chơi hay không? Nhưng gờ chỉ nghĩ đến việc độc đối thủ đã.
                 if (target_type== Target_type.Enemy)
                 {
@@ -77,19 +92,18 @@ namespace Code_Battle_System.Items
                     
                 }
                 
-            }
+            
         }
 
         public void DamageOn()
         {
-            if (effect_type == Effect_type.Damage)
-            {
+           
                 // Chắc chắn rằng cái này chỉ tấn công đối thủ rồi.
                 if (target_type== Target_type.Enemy)
                 {
                     // Cũng sẽ chuyển sang loại đạn có damage to hơn.
                 }
-            }
+            
         }
             
     }
