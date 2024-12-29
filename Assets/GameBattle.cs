@@ -13,6 +13,7 @@ using RoomEnum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameBattle : MonoBehaviour
 {
@@ -27,7 +28,9 @@ public class GameBattle : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject bulletPrefab;
     public GameObject updateHpTextPrefab;
-    public Canvas canvas;
+
+    public GameObject Item1;
+    public GameObject Item2;
     public CinemachineVirtualCamera focusCamera;
     public GameObject characterController;
     // Ensure this is assigned in the Inspector
@@ -44,6 +47,10 @@ public class GameBattle : MonoBehaviour
     private Transform _currentCameraPosition;
     private float cameraTransitionTime = 1f;
     private Vector3 velocity = Vector3.zero; 
+    private bool Item1IsUsed = false;
+    private bool Item2IsUsed = false;
+    private bool IsUsedItem = false;
+    
     private void Awake()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
@@ -65,9 +72,11 @@ public class GameBattle : MonoBehaviour
 
     public void EndGame(EndGamePacket packet)
     {
+        Debug.Log("my team is "+_myTeam) ;
         if(packet.TeamWin == _myTeam)
         {
             EndText.text = "Victory";
+            
             
 
         }
@@ -193,7 +202,7 @@ public class GameBattle : MonoBehaviour
 
         }
 
-        
+        IsUsedItem = false;
         clockCoroutine = StartCoroutine(Clock(20));
         _currentPlayerName = Players[packet.playerName].GetComponent<Unit>().nameText.gameObject;
         blinkNameCoroutine = StartCoroutine(BlinkName(_currentPlayerName));
@@ -294,12 +303,18 @@ public class GameBattle : MonoBehaviour
     public void createUpdateHpText(int takeDamage,GameObject player)
     {
         string text = takeDamage.ToString();
+        if (takeDamage > 0)
+        {
+            text =  "+" + takeDamage.ToString();
+        }
         Vector3 textPosition = new Vector3(player.transform.position.x, player.transform.position.y+3, player.transform.position.z);
         if (updateHpTextPrefab != null)
         {
             Debug.Log("updateHpText spawn");
             GameObject newText = (GameObject)Instantiate(updateHpTextPrefab, textPosition, Quaternion.identity);
             newText.transform.GetComponent<TextMeshPro>().text = text;
+            if(takeDamage > 0){newText.transform.GetComponent<TextMeshPro>().color = Color.green;}
+            
             newText.gameObject.SetActive(true);
             // newText.transform.SetParent(canvas.transform, false);
         }
@@ -314,6 +329,61 @@ public class GameBattle : MonoBehaviour
             {
                 script.Destroy();
                 Debug.Log("Destroy player");
+            }
+        }
+    }
+
+    public void UseItem1()
+    
+    {
+        if (!Item1IsUsed && !IsUsedItem)
+        {
+            if (Players[NetworkStaticManager.ClientHandle.GetUsername()] != null)
+            {
+                Unit script = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponent<Unit>();
+                if (script != null)
+                {
+                    int NewHp = script.getHealthCurrent()+350;
+                    if(NewHp >= script.getHealthMax())
+                    {
+                        NewHp = script.getHealthMax();
+                    }
+                    NetworkStaticManager.ClientHandle.SendHPPacket(NetworkStaticManager.ClientHandle.GetUsername(),NewHp);
+                    Item1IsUsed = true;
+                    IsUsedItem = true;
+                    if (Item1 != null)
+                    {
+                        Image image = Item1.GetComponent<Image>();
+                        image.color = new Color(125f / 255f, 125f / 255f, 125f / 255f, 1f);
+                    }   
+                }
+            }
+        }
+    }
+    public void UseItem2()
+    
+    {
+        if (!Item2IsUsed && !IsUsedItem)
+        {
+            if (Players[NetworkStaticManager.ClientHandle.GetUsername()] != null)
+            {
+                Unit script = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponent<Unit>();
+                if (script != null)
+                {
+                    int NewHp = script.getHealthCurrent()+350;
+                    if(NewHp >= script.getHealthMax())
+                    {
+                        NewHp = script.getHealthMax();
+                    }
+                    NetworkStaticManager.ClientHandle.SendHPPacket(NetworkStaticManager.ClientHandle.GetUsername(),NewHp);
+                    Item2IsUsed = true;
+                    IsUsedItem = true;
+                    if (Item2 != null)
+                    {
+                        Image image = Item2.GetComponent<Image>();
+                        image.color = new Color(125f / 255f, 125f / 255f, 125f / 255f, 1f);
+                    }   
+                }
             }
         }
     }
