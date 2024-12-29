@@ -157,11 +157,13 @@ namespace Code_Battle_System.Character
                 if (script.getUnitName() == NetworkStaticManager.ClientHandle.GetUsername())
                 {
                     
-                    NetworkStaticManager.ClientHandle.SendPlayerDie(NetworkStaticManager.ClientHandle.GetUsername());
+                    NetworkStaticManager.ClientHandle.SendHPPacket(NetworkStaticManager.ClientHandle.GetUsername(),0);
                     NetworkStaticManager.ClientHandle.SendEndTurn(NetworkStaticManager.ClientHandle.GetUsername());
-                    Destroy(gameObject);
+                    
                 }
+                
             }
+            
             
         }
         //Player can moving
