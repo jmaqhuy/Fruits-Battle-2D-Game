@@ -139,14 +139,19 @@ namespace NetworkThread.Multiplayer
                     Debug.Log("get turn packet");
                     packet = new StartTurnPacket();
                     packet.NetIncomingMessageToPacket(message);
-                    script = (GameBattle)_uiScripts;
-                    script.GetTurn((StartTurnPacket)packet);
+                    if (_uiScripts is GameBattle gameBattle1)
+                    {
+                        gameBattle1.GetTurn((StartTurnPacket)packet);
+                    }
                     break;
                 case PacketTypes.GameBattle.EndTurnPacket:
                     packet = new EndTurnPacket();
                     packet.NetIncomingMessageToPacket(message);
-                    script = (GameBattle)_uiScripts;
-                    script.EndTurn((EndTurnPacket)packet);
+                    if (_uiScripts is GameBattle gameBattle)
+                    {
+                        gameBattle.EndTurn((EndTurnPacket)packet);
+                    }
+                    
                     break;
                 case PacketTypes.GameBattle.EndGamePacket:
                     packet = new EndGamePacket();
@@ -157,8 +162,11 @@ namespace NetworkThread.Multiplayer
                 case PacketTypes.GameBattle.PositionPacket:
                     packet = new PositionPacket();
                     packet.NetIncomingMessageToPacket(message);
-                    script = (GameBattle)_uiScripts;
-                    script.UpdatePosition((PositionPacket)packet);
+                    if (_uiScripts is GameBattle gameBattle2)
+                    {
+                        gameBattle2.UpdatePosition((PositionPacket)packet);
+                    }
+                    
                     break;
 
                 case PacketTypes.GameBattle.HealthPointPacket:
@@ -166,6 +174,7 @@ namespace NetworkThread.Multiplayer
                     packet.NetIncomingMessageToPacket(message);
                     script = (GameBattle)_uiScripts;
                     script.UpdateHP((HealthPointPacket)packet);
+                    
                     break;
                 case PacketTypes.GameBattle.PlayerDiePacket:
                     packet = new PlayerDiePacket();

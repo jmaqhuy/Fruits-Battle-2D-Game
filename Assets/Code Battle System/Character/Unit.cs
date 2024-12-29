@@ -51,10 +51,7 @@ namespace Code_Battle_System.Character
             healthText.text = this.HealthCurrent+"/"+this.HeathMax;
             healthSlider.fillRect.GetComponent<Image>().color = gradientColor.Evaluate(healthPercentage);
 
-            if(health == 0 && this.unitName == NetworkStaticManager.ClientHandle.GetUsername())
-            {
-                NetworkStaticManager.ClientHandle.SendPlayerDie(this.unitName);
-            }
+           
         }
 
         
