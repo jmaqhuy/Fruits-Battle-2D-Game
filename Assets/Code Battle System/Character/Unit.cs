@@ -73,6 +73,10 @@ namespace Code_Battle_System.Character
             return this.HealthCurrent;
         }
 
+        public int getHealthMax()
+        {
+            return this.HeathMax;
+        }
         
 
         public string getUnitName()
