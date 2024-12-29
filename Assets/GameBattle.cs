@@ -38,8 +38,12 @@ public class GameBattle : MonoBehaviour
     private Coroutine clockCoroutine;
     private Coroutine blinkNameCoroutine;
     private GameObject _currentPlayerName;
-    
 
+    private Transform _oldCameraPosition;
+    private Transform _targetCameraPosition;
+    private Transform _currentCameraPosition;
+    private float cameraTransitionTime = 1f;
+    private Vector3 velocity = Vector3.zero; 
     private void Awake()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
@@ -71,11 +75,16 @@ public class GameBattle : MonoBehaviour
         {
             EndText.text = "Defeat";
         }
-        MonoBehaviour[] components = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponents<MonoBehaviour>();
-        foreach (MonoBehaviour component in components)
+
+        if (Players[NetworkStaticManager.ClientHandle.GetUsername()] != null)
         {
-            Destroy(component);
+            MonoBehaviour[] components = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponents<MonoBehaviour>();
+            foreach (MonoBehaviour component in components)
+            {
+                Destroy(component);
+            }
         }
+       
         EndGamePanel.SetActive(true);
     }
     public void BackToRoom()
@@ -96,7 +105,11 @@ public class GameBattle : MonoBehaviour
     {
         while (true)
         {
-            playerName.SetActive(!playerName.activeSelf);
+            if (playerName != null)
+            {
+                playerName.SetActive(!playerName.activeSelf);
+            }
+            
             yield return new WaitForSeconds(1);
         }
     }
@@ -161,6 +174,7 @@ public class GameBattle : MonoBehaviour
     public void GetTurn(StartTurnPacket packet)
     {
         
+        //
         StopAllCoroutinesManually(_currentPlayerName);
         if (Players.ContainsKey(NetworkStaticManager.ClientHandle.GetUsername()))
         {
@@ -178,12 +192,20 @@ public class GameBattle : MonoBehaviour
             }
 
         }
-        focusCamera.Follow = Players[packet.playerName].transform;
+
+        
         clockCoroutine = StartCoroutine(Clock(20));
         _currentPlayerName = Players[packet.playerName].GetComponent<Unit>().nameText.gameObject;
         blinkNameCoroutine = StartCoroutine(BlinkName(_currentPlayerName));
+       
+        focusCamera.Follow = Players[packet.playerName].transform;
+
 
     }
+    
+
+
+    
     public void EndTurn(EndTurnPacket packet)
     {
         if (Players.ContainsKey(NetworkStaticManager.ClientHandle.GetUsername()))
@@ -212,7 +234,9 @@ public class GameBattle : MonoBehaviour
             return;
         }
         GameObject bullet = Instantiate(bulletPrefab, position, Quaternion.identity);
+        
         bullet.SetActive(true);
+        focusCamera.Follow = bullet.transform;
         Unit script = Players[packet.playerName].GetComponent<Unit>();
         if (script == null)
         {
@@ -265,6 +289,7 @@ public class GameBattle : MonoBehaviour
         {
             script.setHealthCurrent(packet.HP);
         }
+       
     }
     public void createUpdateHpText(int takeDamage,GameObject player)
     {
@@ -282,11 +307,14 @@ public class GameBattle : MonoBehaviour
     }
     public void PlayerDie(PlayerDiePacket packet)
     {
-        Unit script = Players[packet.player].GetComponent<Unit>();
-        if (script != null)
+        if (Players[packet.player] != null)
         {
-            script.Destroy();
-            Debug.Log("Destroy player");
+            Unit script = Players[packet.player].GetComponent<Unit>();
+            if (script != null)
+            {
+                script.Destroy();
+                Debug.Log("Destroy player");
+            }
         }
     }
 

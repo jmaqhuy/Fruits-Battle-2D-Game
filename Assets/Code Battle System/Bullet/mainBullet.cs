@@ -6,6 +6,7 @@ using Code_Battle_System.Character;
 using NetworkThread;
 using System.Collections;
 using RoomEnum;
+using Unity.Collections.LowLevel.Unsafe;
 
 
 namespace Code_Battle_System.Bullet
@@ -133,6 +134,7 @@ namespace Code_Battle_System.Bullet
                     if (NetworkStaticManager.ClientHandle.GetUsername() == this.shooter)
                     {
                         NetworkStaticManager.ClientHandle.SendHPPacket(uniEnemy.getUnitName(), currentHP);
+                        NetworkStaticManager.ClientHandle.SendEndTurn(this.shooter);
                     }
 
                     // Destroy the projectile (bullet)

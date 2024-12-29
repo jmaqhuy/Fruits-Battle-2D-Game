@@ -44,6 +44,7 @@ namespace Code_Battle_System.Character
         private Image manaFill;
         public float speedOfMana = 1f;
         private bool controllerWarking = true;
+        private bool playerAlive = true;
         private Vector3 previousPosition;
         // Start is called before the first frame update
         void Start()
@@ -140,6 +141,30 @@ namespace Code_Battle_System.Character
             {
                 speedMovement = 0;
             }
+
+            if (gameObject.transform.position.y < 230 && playerAlive)
+            {
+                playerUnderMap();
+                playerAlive = false;
+            }
+        }
+
+        private void playerUnderMap()
+        {
+            Unit script = gameObject.GetComponent<Unit>();
+            if (script != null)
+            {
+                if (script.getUnitName() == NetworkStaticManager.ClientHandle.GetUsername())
+                {
+                    
+                    NetworkStaticManager.ClientHandle.SendHPPacket(NetworkStaticManager.ClientHandle.GetUsername(),0);
+                    NetworkStaticManager.ClientHandle.SendEndTurn(NetworkStaticManager.ClientHandle.GetUsername());
+                    
+                }
+                
+            }
+            
+            
         }
         //Player can moving
         private void FixedUpdate()
