@@ -74,7 +74,8 @@ namespace NetworkThread.Multiplayer
 
         public enum Character : byte
         {
-            GetCurrentCharacterPacket = 60,
+            GetCurrentCharacterPacket = 70,
+            ChangeCharacterPoint,
         }
 
         
@@ -712,6 +713,20 @@ namespace NetworkThread.Multiplayer
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
             Character = CharacterPacket.Deserialize(message);
+        }
+    }
+    public class ChangeCharacterPoint : Packet
+    {
+        public CharacterPacket Character { get; set; }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Character.ChangeCharacterPoint);
+            Character.Serialize(message);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            
         }
     }
 

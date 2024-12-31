@@ -1,10 +1,18 @@
 using System;
+using System.Linq;
+using DataTransfer;
+using NetworkThread;
+using NetworkThread.Multiplayer.Packets;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CharacterInfoTabScript : MonoBehaviour
 {
+    [Header("Characters Data")]
+    public CharactersData characterData;
+
+    private CharacterPacket character;
     public GameObject characterImage;
     public GameObject characterShadow;
     public TextMeshProUGUI characterName;
@@ -39,11 +47,7 @@ public class CharacterInfoTabScript : MonoBehaviour
     public Button minusPointArmor;
     public Button addPointLucky;
     public Button minusPointLucky;
-
-    private int _currentHpPoint;
-    private int _currentDamagePoint;
-    private int _currentArmorPoint;
-    private int _currentLuckyPoint;
+    
     private int _availablePoint;
     
     private int _newHpPoint;
@@ -52,99 +56,142 @@ public class CharacterInfoTabScript : MonoBehaviour
     private int _newLuckyPoint;
     private int _remainingPoints;
 
-    public void ParseCharacterBaseInfo(string cName, int cLevel, int cExperience, int cHp, int cDamage, int cArmor, int cLucky)
+    private void Start()
     {
-        characterName.text = cName;
-        foreach (var cl in characterLevel)
-        {
-            cl.text = cLevel.ToString();
-        }
-        characterExperience.text = "Exp: " + cExperience;
-        characterHp.text = (cHp + _currentHpPoint * 100).ToString();
-        characterDamage.text = (cDamage + _currentDamagePoint * 10).ToString();
-        characterArmor.text = (cArmor + _currentArmorPoint * 10).ToString();
-        characterLucky.text = (cLucky + _currentLuckyPoint * 10).ToString();
-        
+        saveAddPointButton.onClick.AddListener(OnClickSaveAddPoint);
+        character = characterData.Characters
+            .FirstOrDefault(c => c.IsSelected);
     }
 
-    public void ParseCharacterProperties(int cHpPoint, int cDamagePoint, int cArmorPoint, int cLuckyPoint,
-        int avPoint)
+    private void OnClickSaveAddPoint()
     {
-        _currentHpPoint = _newHpPoint = cHpPoint;
-        _currentDamagePoint = _newDamagePoint = cDamagePoint;
-        _currentArmorPoint = _newArmorPoint =cArmorPoint;
-        _currentLuckyPoint = _newLuckyPoint = cLuckyPoint;
-        _availablePoint = _remainingPoints = avPoint;
+        character.HpPoint = _newHpPoint;
+        character.DamagePoint = _newDamagePoint;
+        character.ArmorPoint = _newArmorPoint;
+        character.LuckPoint = _newLuckyPoint;
+        _availablePoint = _remainingPoints;
+        NetworkStaticManager.ClientHandle.SendChangeCharacterPointPacket(character);
+        UpdateCharacterInformation();
+        UpdateButtonStates();
+    }
+
+    public void ParseCharacterBaseInfo()
+    {
         
-        characterHpPoint.text = _currentHpPoint.ToString();
-        characterDamagePoint.text = _currentDamagePoint.ToString();
-        characterArmorPoint.text = _currentArmorPoint.ToString();
-        characterLuckyPoint.text = _currentLuckyPoint.ToString();
+        if (character != null)
+        {
+            characterName.text = character.CharacterName;
+            foreach (var cl in characterLevel)
+            {
+                cl.text = character.CharacterLevel.ToString();
+            }
+            characterExperience.text = "Exp: " + character.CharacterXp;
+            
+            _newHpPoint = character.HpPoint;
+            _newDamagePoint = character.DamagePoint;
+            _newArmorPoint = character.ArmorPoint;
+            _newLuckyPoint = character.LuckPoint;
+            _availablePoint = _remainingPoints = character.CharacterLevel - 1 -
+                                                 ( character.HpPoint 
+                                                 + character.DamagePoint
+                                                 + character.ArmorPoint
+                                                 + character.LuckPoint);
+            UpdateCharacterInformation();
+        }
+    }
+
+    private void UpdateCharacterInformation()
+    {
+        characterHp.text = (character.CharacterHp + character.HpPoint * 100).ToString();
+        characterDamage.text = (character.CharacterDamage + character.DamagePoint * 10).ToString();
+        characterArmor.text = (character.CharacterArmor + character.ArmorPoint * 10).ToString();
+        characterLucky.text = (character.CharacterLuck + character.LuckPoint).ToString();
+        characterHp.color = Color.black;
+        characterDamage.color = Color.black;
+        characterArmor.color = Color.black;
+        characterLucky.color = Color.black;
+        characterHpPoint.text = character.HpPoint.ToString();
+        characterDamagePoint.text = character.DamagePoint.ToString();
+        characterArmorPoint.text = character.ArmorPoint.ToString();
+        characterLuckyPoint.text = character.LuckPoint.ToString();
         availablePoint.text = _availablePoint.ToString();
         UpdateButtonStates();
     }
 
-    public void AddHpPoint() => AdjustPoint(ref _newHpPoint, characterHpPoint, 1);
+    public void AddHpPoint() => AdjustPoint(ref _newHpPoint, characterHpPoint, characterHp, 1,1);
 
-    public void AddDamagePoint() => AdjustPoint(ref _newDamagePoint, characterDamagePoint, 1);
+    public void AddDamagePoint() => AdjustPoint(ref _newDamagePoint, characterDamagePoint, characterDamage, 1,2);
     
-    public void AddArmorPoint() => AdjustPoint(ref _newArmorPoint, characterArmorPoint, 1);
+    public void AddArmorPoint() => AdjustPoint(ref _newArmorPoint, characterArmorPoint, characterArmor, 1,3);
     
-    public void AddLuckyPoint() => AdjustPoint(ref _newLuckyPoint, characterLuckyPoint, 1);
+    public void AddLuckyPoint() => AdjustPoint(ref _newLuckyPoint, characterLuckyPoint, characterLucky, 1,4);
 
-    public void RemoveHpPoint() => AdjustPoint(ref _newHpPoint, characterHpPoint, -1);
+    public void RemoveHpPoint() => AdjustPoint(ref _newHpPoint, characterHpPoint, characterHp, -1,1);
 
-    public void RemoveDamagePoint() => AdjustPoint(ref _newDamagePoint, characterDamagePoint, -1);
+    public void RemoveDamagePoint() => AdjustPoint(ref _newDamagePoint, characterDamagePoint, characterDamage, -1,2);
 
-    public void RemoveArmorPoint() => AdjustPoint(ref _newArmorPoint, characterArmorPoint, -1);
+    public void RemoveArmorPoint() => AdjustPoint(ref _newArmorPoint, characterArmorPoint, characterArmor, -1,3);
 
-    public void RemoveLuckyPoint() => AdjustPoint(ref _newLuckyPoint, characterLuckyPoint, -1);
+    public void RemoveLuckyPoint() => AdjustPoint(ref _newLuckyPoint, characterLuckyPoint, characterLucky, -1,4);
     
-    private void AdjustPoint(ref int currentPoint, TextMeshProUGUI pointText, int adjustment)
+    private void AdjustPoint(ref int currentPoint, TextMeshProUGUI pointText, TextMeshProUGUI value, int adjustment, int type)
     {
         currentPoint += adjustment;
         _remainingPoints -= adjustment;
         pointText.text = currentPoint.ToString();
         availablePoint.text = _remainingPoints.ToString();
+        value.color = Color.green;
+        switch (type)
+        {
+            default:
+                value.text = (character.CharacterHp + currentPoint * 100).ToString();
+                break;
+            case 2:
+                value.text = (character.CharacterDamage + currentPoint * 10).ToString();
+                break;
+            case 3:
+                value.text = (character.CharacterArmor + currentPoint * 10).ToString();
+                break;
+            case 4:
+                value.text = (character.CharacterLuck + currentPoint * 10).ToString();
+                break;
+        }
         UpdateButtonStates();
     }
     
     private int TotalPointChange()
     {
-        return (_newHpPoint - _currentHpPoint)
-            + (_newDamagePoint - _currentDamagePoint)
-            + (_newArmorPoint - _currentArmorPoint)
-            + (_newLuckyPoint - _currentLuckyPoint);
+        return (_newHpPoint - character.HpPoint)
+            + (_newDamagePoint - character.DamagePoint)
+            + (_newArmorPoint - character.ArmorPoint)
+            + (_newLuckyPoint - character.LuckPoint);
     }
 
     public void CancelAddPoint()
     {
-        _newHpPoint = _currentHpPoint;
-        characterHpPoint.text = _currentHpPoint.ToString();
-        _newDamagePoint = _currentDamagePoint;
-        characterDamagePoint.text = _currentDamagePoint.ToString();
-        _newArmorPoint = _currentArmorPoint;
-        characterArmorPoint.text = _currentArmorPoint.ToString();
-        _newLuckyPoint = _currentLuckyPoint;
-        characterLuckyPoint.text = _currentLuckyPoint.ToString();
+        _newHpPoint = character.HpPoint;
+        _newDamagePoint = character.DamagePoint;
+        _newArmorPoint = character.ArmorPoint;
+        _newLuckyPoint = character.LuckPoint;
         _remainingPoints = _availablePoint;
-        availablePoint.text = _availablePoint.ToString();
+        
+        UpdateCharacterInformation();
         UpdateButtonStates();
     }
-    private void UpdateButtonStates()
+    public void UpdateButtonStates()
     {
-        minusPointHp.interactable = _currentHpPoint != _newHpPoint;
-        minusPointDamage.interactable = _currentDamagePoint != _newDamagePoint;
-        minusPointArmor.interactable = _currentArmorPoint != _newArmorPoint;
-        minusPointLucky.interactable = _currentLuckyPoint != _newLuckyPoint;
+        minusPointHp.interactable = character.HpPoint != _newHpPoint;
+        minusPointDamage.interactable = character.DamagePoint != _newDamagePoint;
+        minusPointArmor.interactable = character.ArmorPoint != _newArmorPoint;
+        minusPointLucky.interactable = character.LuckPoint != _newLuckyPoint;
         
         addPointButton.interactable = _availablePoint != 0;
         
         saveAddPointButton.interactable = _availablePoint != _remainingPoints;
-        resetPointsButton.interactable = (_currentHpPoint +
-                                          _currentDamagePoint +
-                                          _currentArmorPoint +
-                                          _currentLuckyPoint) != 0;
+        resetPointsButton.interactable = (character.HpPoint +
+                                          character.DamagePoint +
+                                          character.ArmorPoint +
+                                          character.LuckPoint) != 0;
 
         var maxPointsReached = TotalPointChange() == _availablePoint;
         addPointHp.interactable = !maxPointsReached;

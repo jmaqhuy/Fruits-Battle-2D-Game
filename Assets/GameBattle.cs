@@ -68,6 +68,7 @@ public class GameBattle : MonoBehaviour
     void Start()
     {
         Debug.Log("OK");
+        Debug.Log($"Start Scene Battle. Number of players: {roomData.PlayersInRoom.Count}");
     }
 
     public void EndGame(EndGamePacket packet)
@@ -76,13 +77,14 @@ public class GameBattle : MonoBehaviour
         if(packet.TeamWin == _myTeam)
         {
             EndText.text = "Victory";
-            
+            EndText.color = Color.blue;
             
 
         }
         else
         {
             EndText.text = "Defeat";
+            EndText.color = Color.red;
         }
 
         if (Players[NetworkStaticManager.ClientHandle.GetUsername()] != null)
@@ -99,6 +101,7 @@ public class GameBattle : MonoBehaviour
     public void BackToRoom()
     {
         SceneManager.LoadScene("Waiting Room");
+        Debug.Log($"End Scene Battle. Number of players: {roomData.PlayersInRoom.Count}");
     }
 
     private IEnumerator Clock(int start)
@@ -174,7 +177,8 @@ public class GameBattle : MonoBehaviour
         script.setIsLest(true);
         Color color = _myTeam == packet.Team ? Color.green : Color.red;
         if (packet.playerSpawn == NetworkStaticManager.ClientHandle.GetUsername()) color = Color.yellow;
-        script.setUnitName(packet.playerSpawn , color);
+        script.setUnitName(packet.playerSpawn);
+        script.SetDisplayName(packet.DisplayName, color);
         Physics.SyncTransforms();
         player.SetActive(true);
         Players[packet.playerSpawn] = player;

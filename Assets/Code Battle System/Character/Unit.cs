@@ -61,10 +61,14 @@ namespace Code_Battle_System.Character
 
         }
 
-        public void setUnitName(string unitName, Color c)
+        public void setUnitName(string unitName)
         {
             this.unitName = unitName;
-            nameText.text = unitName;
+        }
+
+        public void SetDisplayName(string displayName, Color c)
+        {
+            nameText.text = displayName;
             nameText.color = c;
         }
 

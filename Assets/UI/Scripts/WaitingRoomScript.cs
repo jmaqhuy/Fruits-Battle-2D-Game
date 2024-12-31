@@ -68,12 +68,17 @@ public class WaitingRoomScript : MonoBehaviour
             PasteRoomInfo(roomData.RoomPacket);
             SetUIForAll(roomData.PlayersInRoom);
         }
+        /*else
+        {
+            NetworkStaticManager.ClientHandle.SendJoinRoomPacket(RoomMode.Normal, RoomType.TwoVsTwo);
+        }*/
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         buttonBack.onClick.AddListener(OnButtonBackClick);
         Item1.onClick.AddListener(() => OnItemClick(1));
         Item2.onClick.AddListener(() => OnItemClick(2));
         ReadyButton.onClick.AddListener(PlayerReadyClick);
         StartButton.onClick.AddListener(StartGameButtonClick);
+        Debug.Log($"Start Scene Waiting Room. Number of players: {roomData.PlayersInRoom.Count}");
     }
 
     private void StartGameButtonClick()
@@ -250,6 +255,8 @@ public class WaitingRoomScript : MonoBehaviour
             SetPlayerDetails(playerList[player.Position - 1].GetComponent<PlayerInWaitingRoom>(), player);
             playerList[player.Position - 1 ].SetActive(true);
         }
+
+        roomData.PlayersInRoom = players;
     }
 
     private void HideAllPlayers(GameObject[] playerList)
@@ -305,6 +312,11 @@ public class WaitingRoomScript : MonoBehaviour
     public void ReceiveStartGame(SpawnPlayerPacketToAll packet)
     {
         positionsData.spawnPlayerPackets = packet.SPPacket;
+        Debug.Log($"End Scene Waiting Room. Number of players: {roomData.PlayersInRoom.Count}");
+        foreach (var player in roomData.PlayersInRoom)
+        {
+            player.isReady = false;
+        }
         LoadMap();
     }
 }

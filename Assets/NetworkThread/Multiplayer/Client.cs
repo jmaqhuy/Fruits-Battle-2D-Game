@@ -971,6 +971,7 @@ namespace NetworkThread.Multiplayer
             {
                 Username = _username,
             }.PacketToNetOutGoingMessage(message);
+            Debug.Log($"User: {_username} send Current Character Packet");
             client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
@@ -978,6 +979,17 @@ namespace NetworkThread.Multiplayer
         {
             NetOutgoingMessage outmsg = client.CreateMessage();
             new RoomListPacket().PacketToNetOutGoingMessage(outmsg);
+            client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
+        public void SendChangeCharacterPointPacket(CharacterPacket character)
+        {
+            NetOutgoingMessage outmsg = client.CreateMessage();
+            new ChangeCharacterPoint()
+            {
+                Character = character,
+            }.PacketToNetOutGoingMessage(outmsg);
             client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
