@@ -111,7 +111,7 @@ namespace Code_Battle_System.Bullet
                     int takeDame;
 
                     // Damage calculation based on armor
-                    if (this.damage <= uniEnemy.getArmor())
+                    if (this.damage - uniEnemy.getArmor() <= damage*0.1)
                     {
                         takeDame = (int)(this.damage * 0.1);  // Reduced damage if armor is high
                     }
