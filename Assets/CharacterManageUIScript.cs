@@ -17,8 +17,6 @@ public class CharacterManageUIScript : MonoBehaviour
     public GameObject SelectCharacterPanel;
     public SelectCharacterTabScript SelectCharacterTabScript;
     
-    public CharactersData CharactersData;
-    
     private Animator _animator;
     
     void Start()

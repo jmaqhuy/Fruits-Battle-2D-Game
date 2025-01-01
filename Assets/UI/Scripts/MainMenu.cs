@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using DataTransfer;
 using NetworkThread;
 using NetworkThread.Multiplayer;
+using NetworkThread.Multiplayer.Packets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -49,27 +49,22 @@ public class MainMenu : MonoBehaviour
         {
             SetDisplayNameTMP(userData.UserInfo.displayName);
             HideChangeDisplayNamePanel();
-            
         }
+
+        try
+        {
+            if (charactersData.Characters.Count == 0)
+            {
+                NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
+            }
+        }
+        catch (Exception ex)
+        {
+            NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
+        }
+        
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        /*if (firstTime)
-        {
-            ShowChangeDisplayNamePanel(false);
-        }
-        else
-        {
-        SetDisplayNameTMP(userData.UserInfo.displayName);
-            HideChangeDisplayNamePanel();
-        }*/
-        // NetworkStaticManager.ClientHandle.SendChangeDisplayNamePacket(newDisplayName.text);
-        // SetDisplayNameTMP(newDisplayName.text);
-        // userData.UserInfo.displayName = newDisplayName.text;
-        // HideChangeDisplayNamePanel();
-    }
     public void OnChangeDisplayNameButtonClicked()
     {
         NetworkStaticManager.ClientHandle.SendChangeDisplayNamePacket(newDisplayName.text);
@@ -105,12 +100,13 @@ public class MainMenu : MonoBehaviour
 
     private void GoToCharacters()
     {
-        NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
-    }
-    public void LoadCharacterScene(GetCurrentCharacterPacket packet)
-    {
-        charactersData.Characters.Add(packet.Character);
         SceneManager.LoadScene("Character Manager");
+    }
+
+    public void ParseCharacters(GetCurrentCharacterPacket packet)
+    {
+        charactersData.Characters = new List<CharacterPacket> { packet.Character };
+        Debug.Log("Number of Character: " + charactersData.Characters.Count);
     }
 
     public void ShowMyProfile()
@@ -143,6 +139,7 @@ public class MainMenu : MonoBehaviour
     public void ExitAcount()
     {
         NetworkStaticManager.ClientHandle.SendLogoutPacket();
+        charactersData.Characters.Clear();
         SceneManager.LoadScene("Login");
     }
 

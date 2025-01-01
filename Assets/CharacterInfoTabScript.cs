@@ -61,6 +61,7 @@ public class CharacterInfoTabScript : MonoBehaviour
         saveAddPointButton.onClick.AddListener(OnClickSaveAddPoint);
         character = characterData.Characters
             .FirstOrDefault(c => c.IsSelected);
+        Debug.Log("Number of Character: " + characterData.Characters.Count);
     }
 
     private void OnClickSaveAddPoint()
@@ -85,8 +86,10 @@ public class CharacterInfoTabScript : MonoBehaviour
             {
                 cl.text = character.CharacterLevel.ToString();
             }
-            characterExperience.text = "Exp: " + character.CharacterXp;
-            
+            var maxXP = (int)Math.Pow(character.CharacterLevel, 1.5) * 100;
+            characterExperience.text = $"Exp: {character.CharacterXp}/{maxXP}";
+            characterExperienceSlider.maxValue = maxXP;
+            characterExperienceSlider.value = character.CharacterXp;
             _newHpPoint = character.HpPoint;
             _newDamagePoint = character.DamagePoint;
             _newArmorPoint = character.ArmorPoint;

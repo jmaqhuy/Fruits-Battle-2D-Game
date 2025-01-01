@@ -244,7 +244,7 @@ namespace NetworkThread.Multiplayer
                     packet.NetIncomingMessageToPacket(message);
                     if (_uiScripts is MainMenu mainMenu)
                     {
-                        mainMenu.LoadCharacterScene((GetCurrentCharacterPacket)packet);
+                        mainMenu.ParseCharacters((GetCurrentCharacterPacket)packet);
                     }
                     break;
                 default:

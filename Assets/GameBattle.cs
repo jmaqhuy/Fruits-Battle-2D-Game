@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,10 @@ public class GameBattle : MonoBehaviour
 
     [Header("End Game Panel")]
     public GameObject EndGamePanel;
-    public TextMeshProUGUI EndText;
+    public GameObject VictoryPanel;
+    public GameObject DefeatPanel;
+    public TextMeshProUGUI Exp;
+    public Button BackToWaitingRoomButton;
     
     [Header("Game Prefab")]
     public GameObject playerPrefab;
@@ -37,6 +41,7 @@ public class GameBattle : MonoBehaviour
     public Dictionary<string, GameObject> Players;
     public PositionsData positionsData;
     public RoomData roomData;
+    public CharactersData charactersData;
     private Team _myTeam;
     private Coroutine clockCoroutine;
     private Coroutine blinkNameCoroutine;
@@ -67,26 +72,38 @@ public class GameBattle : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Number of Character: " + charactersData.Characters.Count);
         Debug.Log("OK");
         Debug.Log($"Start Scene Battle. Number of players: {roomData.PlayersInRoom.Count}");
+        var character = charactersData.Characters
+            .FirstOrDefault(c => c.IsSelected);
+        Debug.Log($"Character name: {character.CharacterName}, isSelected: {character.IsSelected}," +
+                  $" Exp: {character.CharacterXp}, Level: {character.CharacterLevel}");
     }
 
     public void EndGame(EndGamePacket packet)
     {
+        var character = charactersData.Characters
+            .FirstOrDefault(c => c.IsSelected);
         Debug.Log("my team is "+_myTeam) ;
         if(packet.TeamWin == _myTeam)
         {
-            EndText.text = "Victory";
-            EndText.color = Color.blue;
-            
-
+            VictoryPanel.SetActive(true);
+            DefeatPanel.SetActive(false);
+            Exp.text = "Exp: +45";
+            character.CharacterXp += 45;
+            BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(6,138,22,255);
         }
         else
         {
-            EndText.text = "Defeat";
-            EndText.color = Color.red;
+            VictoryPanel.SetActive(false);
+            DefeatPanel.SetActive(true);
+            Exp.text = "Exp: +30";
+            character.CharacterXp += 30;
+            BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(155,32,6,255);
         }
 
+        if (character.CharacterXp >= (int)Math.Pow(character.CharacterLevel, 1.5) * 100) character.CharacterLevel += 1;
         if (Players[NetworkStaticManager.ClientHandle.GetUsername()] != null)
         {
             MonoBehaviour[] components = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponents<MonoBehaviour>();

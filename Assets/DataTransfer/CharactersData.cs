@@ -7,6 +7,6 @@ namespace DataTransfer
     [CreateAssetMenu(fileName = "NewGameData", menuName = "Game Data/Characters Data")]
     public class CharactersData : ScriptableObject
     {
-        public List<CharacterPacket> Characters = new List<CharacterPacket>();
+        public List<CharacterPacket> Characters;
     }
 }
