@@ -934,7 +934,7 @@ MonoBehaviour:
   position: {fileID: 1849045416}
   roomInfoPrefab: {fileID: 3578836598961567695, guid: 7915c65d183039946b34adbd8f07ee24, type: 3}
   FindButton: {fileID: 1670259965}
-  roomIdFilter: {fileID: 0}
+  roomIdFilter: {fileID: 1990271422}
   RoomModeDropdown: {fileID: 1876810505}
   RoomTypeDropdown: {fileID: 1889658547}
 --- !u!1 &272713843
