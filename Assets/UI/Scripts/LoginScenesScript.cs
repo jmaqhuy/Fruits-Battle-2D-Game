@@ -214,6 +214,7 @@ public class LoginScenesScript : MonoBehaviour
     {
         ShowSuccessPanel(NetworkStaticManager.ClientHandle.GetUsername());
         NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
+        NetworkStaticManager.ClientHandle.GetUserCurrentRank();
     }
 
     public void LoginFail()
@@ -370,6 +371,12 @@ public class LoginScenesScript : MonoBehaviour
     public void ParseUserData(BasicUserInfoPacket packet)
     {
         userData.UserInfo = packet;
+    }
+    
+    public void ParseUserRank(CurrentRankPacket rank)
+    {
+        userData.CurrentRank = rank;
+        Debug.Log($"Parse Completed: Rank: {rank.rankName}, {rank.currentStar}, {rank.rankAssetName}");
     }
     
     private void OnInputChanged(int index, string text)

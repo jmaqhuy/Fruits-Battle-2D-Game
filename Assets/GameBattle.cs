@@ -426,5 +426,9 @@ public class GameBattle : MonoBehaviour
             }
         }
     }
+    public void ParsePlayerInRoomData(JoinRoomPacketToAll packet)
+    {
+        roomData.PlayersInRoom = packet.Players;
+    }
 
 }

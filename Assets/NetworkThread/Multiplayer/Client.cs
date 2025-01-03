@@ -10,13 +10,11 @@ namespace NetworkThread.Multiplayer
 {
     public class Client
     {
-        public NetClient client { get; set; }
+        private NetClient client { get; set; }
         private bool connected = false;
         private MonoBehaviour _uiScripts;
         private MonoBehaviour _invitePopupScripts;
         private string _username = "";
-        public bool loadBasicUserInfo { get; set; } = false;
-        public RoomMode RoomMode;
         
         
         public Client()
@@ -72,6 +70,10 @@ namespace NetworkThread.Multiplayer
                         {
                             HandleGameBattlePacket((PacketTypes.GameBattle)type, message);
                         }
+                        else if (Enum.IsDefined(typeof(PacketTypes.Rank), type))
+                        {
+                            HandleRankPacket((PacketTypes.Rank)type, message);
+                        }
                         else
                         {
                             Debug.Log("Unhandled message type");
@@ -89,7 +91,6 @@ namespace NetworkThread.Multiplayer
                         {
                             Debug.Log("Disconnected from server");
                             connected = false;
-                            loadBasicUserInfo = false;
                         } else if (message.SenderConnection.Status == NetConnectionStatus.InitiatedConnect)
                         {
                             Debug.Log("Initiated connection to server");
@@ -112,6 +113,38 @@ namespace NetworkThread.Multiplayer
                 client.Recycle(message);
             }
         }
+        private void HandleRankPacket(Rank type, NetIncomingMessage message)
+        {
+            Packet packet;
+            switch (type)
+            {
+                case PacketTypes.Rank.CurrentRankPacket:
+                    packet = new CurrentRankPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Get Current Rank Packet");
+                    if (_uiScripts is LoginScenesScript loginScenesScript)
+                    {
+                        Debug.Log("Parse Current Rank to Rank Data");
+                        Debug.Log($"{((CurrentRankPacket)packet).rankName}, {((CurrentRankPacket)packet).currentStar}");
+                        loginScenesScript.ParseUserRank((CurrentRankPacket)packet);
+                    }
+                    break;
+                
+                case PacketTypes.Rank.MatchmakingPacket:
+                    packet = new MatchmakingPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    if (((MatchmakingPacket)packet).start)
+                    {
+                        ((RankScene)_uiScripts).ReceivedStartMatchmakingPacket();
+                    }
+                    else
+                    {
+                        ((RankScene)_uiScripts).ReceivedStopMatchmakingPacket(((MatchmakingPacket)packet).matchFound);
+                    }
+                    
+                    break;
+            }
+        }
 
         private void HandleGameBattlePacket(PacketTypes.GameBattle type, NetIncomingMessage message)
         {
@@ -131,6 +164,10 @@ namespace NetworkThread.Multiplayer
                     if (_uiScripts is WaitingRoomScript wrscript)
                     {
                         wrscript.ReceiveStartGame((SpawnPlayerPacketToAll)packet);
+                    }
+                    else if (_uiScripts is RankScene rs)
+                    {
+                        rs.ReceiveStartGame((SpawnPlayerPacketToAll)packet);
                     }
                     break;
                 case PacketTypes.GameBattle.PlayerOutGamePacket:
@@ -382,7 +419,6 @@ namespace NetworkThread.Multiplayer
             switch (type)
             {
                 case PacketTypes.Room.JoinRoomPacket:
-                case Room.CreateRoomPacket:
                     packet = new JoinRoomPacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("Room joined");
@@ -392,6 +428,19 @@ namespace NetworkThread.Multiplayer
                     } else if (_uiScripts is WaitingRoomScript waitingRoomScript)
                     {
                         waitingRoomScript.PasteRoomInfo(((JoinRoomPacket)packet).room);
+                    }else if (_uiScripts is RankScene rs)
+                    {
+                        rs.UpdateRoomInfo(((JoinRoomPacket)packet).room);
+                    }
+                    break;
+                
+                case PacketTypes.Room.CreateRoomPacket:
+                    packet = new CreateRoomPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    Debug.Log("Room created");
+                    if (_uiScripts is SelectPlayModeScript selectMode4)
+                    {
+                        selectMode4.ParseRoomInfoData(((CreateRoomPacket)packet).room);
                     }
                     break;
                 
@@ -404,6 +453,14 @@ namespace NetworkThread.Multiplayer
                     } else if (_uiScripts is WaitingRoomScript waitingRoomScript)
                     {
                         waitingRoomScript.SetUIForAll(((JoinRoomPacketToAll)packet).Players);
+                    }
+                    else if (_uiScripts is RankScene rankScene)
+                    {
+                        Debug.Log("Update Players In Room Rank Scene");
+                        rankScene.UpdatePlayersInRoom(((JoinRoomPacketToAll)packet).Players);
+                    } else if (_uiScripts is GameBattle gameBattle)
+                    {
+                        gameBattle.ParsePlayerInRoomData(((JoinRoomPacketToAll)packet));
                     }
                     break;
                 
@@ -463,6 +520,17 @@ namespace NetworkThread.Multiplayer
             client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
             
+        }
+        public void SendMatchmakingPacket(int intRoomId, bool isStart)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new MatchmakingPacket()
+            {
+                roomId = intRoomId,
+                start = isStart
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
         }
 
         public void SetInvitePopupScripts(FriendInviteUI script)
@@ -992,6 +1060,42 @@ namespace NetworkThread.Multiplayer
                 Character = character,
             }.PacketToNetOutGoingMessage(outmsg);
             client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+        public void GetUserCurrentRank()
+        {
+            NetOutgoingMessage outmsg = client.CreateMessage();
+            new CurrentRankPacket()
+            {
+                username = _username,
+            }.PacketToNetOutGoingMessage(outmsg);
+            client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
+        public void CreateNewRoom(RoomMode roomMode, RoomType roomType)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new CreateRoomPacket()
+            {
+                room = new RoomPacket()
+                {
+                    roomMode = roomMode,
+                    roomType = roomType
+                }
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
+
+        public void SendChangeRoomTypePacket(RoomPacket roomPacket)
+        {
+            NetOutgoingMessage message = client.CreateMessage();
+            new ChangeRoomTypePacket()
+            {
+                room = roomPacket
+            }.PacketToNetOutGoingMessage(message);
+            client.SendMessage(message, NetDeliveryMethod.ReliableOrdered);
             client.FlushSendQueue();
         }
     }

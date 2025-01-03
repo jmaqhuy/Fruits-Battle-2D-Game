@@ -4,6 +4,7 @@ using DataTransfer;
 using NetworkThread;
 using NetworkThread.Multiplayer;
 using NetworkThread.Multiplayer.Packets;
+using Resources;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -26,7 +27,14 @@ public class MainMenu : MonoBehaviour
     public TMP_InputField newDisplayName;
     public Button acceptButton;
 
-
+    [Header("Profile Panel")]
+    public GameObject profilePanel;
+    public TextMeshProUGUI characterNumber;
+    public TextMeshProUGUI rankName;
+    public SpriteRenderer rankIcon;
+    public GameObject stars;
+    public GameObject starIcon;
+    private List<GameObject> starList = new List<GameObject>();
    
 
     // Start is called before the first frame update
@@ -55,19 +63,6 @@ public class MainMenu : MonoBehaviour
         {
             Debug.Log("Characters data is null");
             NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
-        }
-        else
-        {
-            Debug.Log($"Characters data is not null. Number of characters: {charactersData.Characters.Count}");
-        }
-
-        if (userData.UserInfo == null)
-        {
-            Debug.Log($"User data is null");
-        }
-        else
-        {
-            Debug.Log($"User data is not null. Display name: {userData.UserInfo.displayName}");
         }
     }
 
@@ -117,7 +112,42 @@ public class MainMenu : MonoBehaviour
 
     public void ShowMyProfile()
     {
+        displayNameProfile.text = displayName.text;starIcon.SetActive(true);
         displayNameProfile.text = displayName.text;
+        Sprite rIcon = ResourceLoader.LoadRankSprite(userData.CurrentRank.rankAssetName);
+        Debug.Log(userData.CurrentRank.rankAssetName);
+        if (rIcon != null)
+        {
+            rankIcon.sprite = rIcon;
+        }
+        else
+        {
+            Debug.LogError($"Failed to load rank icon");
+        }
+
+        foreach (GameObject star in starList)
+        {
+            Destroy(star);
+        }
+        starList.Clear();
+
+        var starNum = userData.CurrentRank.currentStar;
+        if (starNum != 0)
+        {
+            for (int i = 0; i < starNum; i++)
+            {
+                starList.Add(Instantiate(starIcon, stars.transform));
+            }
+        }
+        else
+        {
+            GameObject starGO = Instantiate(starIcon, stars.transform);
+            starGO.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
+            starList.Add(starGO);
+        }
+        rankName.text = userData.CurrentRank.rankName;
+        starIcon.SetActive(false);
+        profilePanel.SetActive(true);
     }
 
     private void ShowChangeDisplayNamePanel(bool closeButtonStatus)

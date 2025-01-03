@@ -987,17 +987,17 @@ namespace NetworkThread.Multiplayer
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
             username = message.ReadString();
+            rankName = message.ReadString();
+            rankAssetName = message.ReadString();
+            currentStar = message.ReadInt32();
             seasonId = message.ReadInt32();
+            seasonName = message.ReadString();
         }
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
             message.Write((byte)PacketTypes.Rank.CurrentRankPacket);
             message.Write(username);
-            message.Write(rankName);
-            message.Write(rankAssetName);
-            message.Write(currentStar);
             message.Write(seasonId);
-            message.Write(seasonName);
         }
     }
     public class MatchmakingPacket : Packet

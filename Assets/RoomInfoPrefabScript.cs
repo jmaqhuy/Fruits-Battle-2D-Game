@@ -12,6 +12,7 @@ public class RoomInfoPrefabScript : MonoBehaviour
     private RoomMode _roomMode;
     private RoomType _roomType;
     private RoomStatus _roomStatus;
+    private int _currentPlayers;
     
     public TextMeshProUGUI roomId;
     public TextMeshProUGUI roomName;
@@ -19,6 +20,9 @@ public class RoomInfoPrefabScript : MonoBehaviour
     public TextMeshProUGUI roomType;
     public TextMeshProUGUI players;
     public Image status;
+    
+    private GameObject _errorPanel;
+    private TextMeshProUGUI _errorText;
 
     private void SetStatus(bool roomStatus)
     {
@@ -31,18 +35,26 @@ public class RoomInfoPrefabScript : MonoBehaviour
         _roomMode = mode;
         _roomType = type;
         _roomStatus = rStatus;
+        _currentPlayers = currentPlayers;
 
         
-        this.roomId.text = _intRoomId.ToString();
+        roomId.text = _intRoomId.ToString();
         roomName.text = roomNameText;
         roomMode.text = mode.ToString();
         roomType.text = $"{(int)type/2}vs{(int)type/2}";
-        players.text = $"{currentPlayers}/{(int)type}";
+        players.text = _roomMode != RoomMode.Rank ? $"{currentPlayers}/{(int)type}" : $"{currentPlayers}/{(int)type/2}";
         SetStatus(rStatus == RoomStatus.InLobby);
+        FindErrorPanelAndText();
     }
 
     public void SendJoinRoomPacket()
     {
+        if (_roomMode == RoomMode.Rank && _currentPlayers == (int)_roomType / 2 ||
+            _roomMode != RoomMode.Rank && _currentPlayers == (int)_roomType)
+        {
+            StartCoroutine(ShowErrorPanel($"Room {_intRoomId} is full"));
+            return;
+        }
         NetworkStaticManager.ClientHandle.SendJoinRoomPacket(_roomMode, _roomType, _intRoomId);
     }
 
@@ -54,5 +66,31 @@ public class RoomInfoPrefabScript : MonoBehaviour
     public RoomType GetRoomType()
     {
         return _roomType;
+    }
+    IEnumerator ShowErrorPanel(string errorMessage)
+    {
+        _errorText.text = errorMessage;
+        _errorPanel.SetActive(true);
+        var time = 0;
+        while (time++ < 3)
+        {
+            yield return new WaitForSeconds(1);
+        }
+        _errorPanel.SetActive(false);
+    }
+    void FindErrorPanelAndText()
+    {
+        Transform rootTransform = gameObject.transform.root;
+
+        Transform errorPanelTransform = rootTransform.Find("ErrorPanel");
+        if (errorPanelTransform != null)
+        {
+            _errorPanel = errorPanelTransform.gameObject;
+            Transform errorTextTransform = errorPanelTransform.Find("ErrorText");
+            if (errorTextTransform != null)
+            {
+                _errorText = errorTextTransform.gameObject.GetComponent<TextMeshProUGUI>();
+            }
+        }
     }
 }

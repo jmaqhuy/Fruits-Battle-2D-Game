@@ -7,5 +7,6 @@ namespace DataTransfer
     public class UserData : ScriptableObject
     {
         public BasicUserInfoPacket UserInfo;
+        public CurrentRankPacket CurrentRank;
     }
 }

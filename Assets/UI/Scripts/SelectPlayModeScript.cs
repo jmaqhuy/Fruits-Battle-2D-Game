@@ -4,6 +4,7 @@ using NetworkThread;
 using NetworkThread.Multiplayer;
 using NetworkThread.Multiplayer.Packets;
 using RoomEnum;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -24,6 +25,7 @@ public class SelectPlayModeScript : MonoBehaviour
     
     [Header("Filter")]
     public Button FindButton;
+    public TMP_InputField roomIdFilter;
     public TMPro.TMP_Dropdown RoomModeDropdown;
     public TMPro.TMP_Dropdown RoomTypeDropdown;
 
@@ -35,6 +37,12 @@ public class SelectPlayModeScript : MonoBehaviour
         ReloadRoomListButton.onClick.AddListener(ShowRoomList);
         RoomTypeDropdown.onValueChanged.AddListener(UpdateRoomList);
         RoomModeDropdown.onValueChanged.AddListener(UpdateRoomList);
+        FindButton.onClick.AddListener(FindRoomById);
+    }
+    
+    private void FindRoomById()
+    {
+        UpdateRoomList(0);
     }
     private void ShowRoomList()
     {
@@ -44,6 +52,7 @@ public class SelectPlayModeScript : MonoBehaviour
             Destroy(r);
         }
         _roomInfos.Clear();
+        roomIdFilter.text = "";
         NetworkStaticManager.ClientHandle.SendRoomListPacket();
         _inProcess = true;
     }
@@ -94,6 +103,13 @@ public class SelectPlayModeScript : MonoBehaviour
         {
             r.SetActive(false);
             var rs = r.GetComponent<RoomInfoPrefabScript>();
+            if (!string.IsNullOrEmpty(roomIdFilter.text))
+            {
+                if (roomIdFilter.text != rs.roomId.text)
+                {
+                    continue;
+                }
+            }
             if (RoomModeDropdown.value == 0 && RoomTypeDropdown.value == 0)
             {
                 r.SetActive(true);
@@ -134,7 +150,14 @@ public class SelectPlayModeScript : MonoBehaviour
         {
             if (roomData.RoomPacket != null && roomData.PlayersInRoom.Count > 0)
             {
-                SceneManager.LoadScene("Waiting Room");
+                if (roomData.RoomPacket.roomMode == RoomMode.Normal)
+                {
+                    SceneManager.LoadScene("Waiting Room");
+                }
+                else if (roomData.RoomPacket.roomMode == RoomMode.Rank)
+                {
+                    SceneManager.LoadScene("Rank");
+                }
             }
         }
         finally
@@ -151,12 +174,23 @@ public class SelectPlayModeScript : MonoBehaviour
         {
             if (roomData.RoomPacket != null && roomData.PlayersInRoom.Count > 0)
             {
-                SceneManager.LoadScene("Waiting Room");
+                if (roomData.RoomPacket.roomMode == RoomMode.Normal)
+                {
+                    SceneManager.LoadScene("Waiting Room");
+                }
+                else if (roomData.RoomPacket.roomMode == RoomMode.Rank)
+                {
+                    SceneManager.LoadScene("Rank");
+                }
             }
         }
         finally
         {
             
         }
+    }
+    public void RankModeSelected()
+    {
+        NetworkStaticManager.ClientHandle.CreateNewRoom(RoomMode.Rank, RoomType.OneVsOne);
     }
 }

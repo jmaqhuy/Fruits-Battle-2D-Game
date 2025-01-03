@@ -185,9 +185,6 @@ public class WaitingRoomScript : MonoBehaviour
     {
         RoomName.text = "Room name: " + roomName;
     }
-    
-    public void LoadMap() { SceneManager.LoadScene("Normal Mode Map"); }
-
 
     public void PasteRoomInfo(RoomPacket room)
     {
@@ -319,6 +316,6 @@ public class WaitingRoomScript : MonoBehaviour
         {
             player.isReady = false;
         }
-        LoadMap();
+        SceneManager.LoadScene("Normal Mode Map");
     }
 }
