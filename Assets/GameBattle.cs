@@ -25,7 +25,9 @@ public class GameBattle : MonoBehaviour
     public GameObject EndGamePanel;
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
-    public TextMeshProUGUI Exp;
+    public TextMeshProUGUI LevelText;
+    public TextMeshProUGUI ExpText;
+    public Slider ExpSlider;
     public Button BackToWaitingRoomButton;
     
     [Header("Game Prefab")]
@@ -47,9 +49,6 @@ public class GameBattle : MonoBehaviour
     private Coroutine blinkNameCoroutine;
     private GameObject _currentPlayerName;
 
-    private Transform _oldCameraPosition;
-    private Transform _targetCameraPosition;
-    private Transform _currentCameraPosition;
     private float cameraTransitionTime = 1f;
     private Vector3 velocity = Vector3.zero; 
     private bool Item1IsUsed = false;
@@ -72,25 +71,26 @@ public class GameBattle : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Number of Character: " + charactersData.Characters.Count);
         Debug.Log("OK");
         Debug.Log($"Start Scene Battle. Number of players: {roomData.PlayersInRoom.Count}");
-        var character = charactersData.Characters
-            .FirstOrDefault(c => c.IsSelected);
-        Debug.Log($"Character name: {character.CharacterName}, isSelected: {character.IsSelected}," +
-                  $" Exp: {character.CharacterXp}, Level: {character.CharacterLevel}");
     }
 
     public void EndGame(EndGamePacket packet)
     {
-        var character = charactersData.Characters
-            .FirstOrDefault(c => c.IsSelected);
+        var character = charactersData.GetCurrentCharacter();
+        LevelText.text = $"Level: {character.CharacterLevel}";
+        
+        var maxXP = (int)Math.Pow(character.CharacterLevel, 1.5) * 100;
+        ExpText.text = $"{character.CharacterXp}/{maxXP}";
+        ExpSlider.maxValue = maxXP;
+        ExpSlider.value = character.CharacterXp;
+        
         Debug.Log("my team is "+_myTeam) ;
         if(packet.TeamWin == _myTeam)
         {
             VictoryPanel.SetActive(true);
             DefeatPanel.SetActive(false);
-            Exp.text = "Exp: +45";
+            
             character.CharacterXp += 45;
             BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(6,138,22,255);
         }
@@ -98,7 +98,7 @@ public class GameBattle : MonoBehaviour
         {
             VictoryPanel.SetActive(false);
             DefeatPanel.SetActive(true);
-            Exp.text = "Exp: +30";
+            
             character.CharacterXp += 30;
             BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(155,32,6,255);
         }
@@ -114,6 +114,24 @@ public class GameBattle : MonoBehaviour
         }
        
         EndGamePanel.SetActive(true);
+        StartCoroutine(EndGamePanelCoroutine());
+    }
+
+    private IEnumerator EndGamePanelCoroutine()
+    {
+        var character = charactersData.GetCurrentCharacter();
+        var maxXP = (int)Math.Pow(character.CharacterLevel, 1.5) * 100;
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            break;
+        }
+
+        while (ExpSlider.value < character.CharacterXp)
+        {
+            ExpText.text = $"{++ExpSlider.value}/{maxXP}";
+            yield return new WaitForSeconds(0.07f);
+        }
     }
     public void BackToRoom()
     {

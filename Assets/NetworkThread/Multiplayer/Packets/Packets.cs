@@ -31,14 +31,16 @@ namespace NetworkThread.Multiplayer
         
         public enum Room : byte
         {
-            JoinRoomPacket = 20,
+            CreateRoomPacket = 20,
+            JoinRoomPacket,
             JoinRoomPacketToAll,
             ExitRoomPacket,
             InviteFriendPacket,
+            ChangeTeamPacket,
             SendChatMessagePacket,
             PlayerReadyPacket,
             RoomListPacket,
-
+            ChangeRoomTypePacket
         }
         public enum GameBattle : byte
         {
@@ -76,6 +78,11 @@ namespace NetworkThread.Multiplayer
         {
             GetCurrentCharacterPacket = 70,
             ChangeCharacterPoint,
+        }
+        public enum Rank : byte
+        {
+            CurrentRankPacket = 80,
+            MatchmakingPacket,
         }
 
         
@@ -936,6 +943,81 @@ namespace NetworkThread.Multiplayer
             message.Write((byte)PacketTypes.GameBattle.AlreadyInMatchPacket);
             message.Write(roomId);
             message.Write(username);
+        }
+    }
+    public class ChangeRoomTypePacket : Packet
+    {
+        public RoomPacket room { get; set; }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            room = RoomPacket.Deserialize(message);
+        }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.ChangeRoomTypePacket);
+            room.Serialize(message);
+        }
+    }
+
+    public class CreateRoomPacket : Packet
+    {
+        public RoomPacket room { get; set; }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            room = RoomPacket.Deserialize(message);
+        }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Room.CreateRoomPacket);
+            room.Serialize(message);
+        }
+    }
+    public class CurrentRankPacket : Packet
+    {
+        public string username { get; set; }
+        public string rankName { get; set; } 
+        public string rankAssetName { get; set; }
+        public int currentStar {  get; set; }
+        public int seasonId { get; set; }
+        public string seasonName { get; set; }
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            username = message.ReadString();
+            seasonId = message.ReadInt32();
+        }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Rank.CurrentRankPacket);
+            message.Write(username);
+            message.Write(rankName);
+            message.Write(rankAssetName);
+            message.Write(currentStar);
+            message.Write(seasonId);
+            message.Write(seasonName);
+        }
+    }
+    public class MatchmakingPacket : Packet
+    {
+        public int roomId { get; set; }
+        public bool start { get; set; }
+        public bool matchFound { get; set; }
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.Rank.MatchmakingPacket);
+            message.Write(roomId);
+            message.Write(start);
+            message.Write(matchFound);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            roomId = message.ReadInt32();
+            start = message.ReadBoolean();
+            matchFound = message.ReadBoolean();
         }
     }
 }

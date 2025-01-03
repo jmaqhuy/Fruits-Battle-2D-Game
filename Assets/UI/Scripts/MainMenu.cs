@@ -51,18 +51,24 @@ public class MainMenu : MonoBehaviour
             HideChangeDisplayNamePanel();
         }
 
-        try
+        if (charactersData.Characters.Count == 0)
         {
-            if (charactersData.Characters.Count == 0)
-            {
-                NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
-            }
-        }
-        catch (Exception ex)
-        {
+            Debug.Log("Characters data is null");
             NetworkStaticManager.ClientHandle.SendCurrentCharacterPacket();
         }
-        
+        else
+        {
+            Debug.Log($"Characters data is not null. Number of characters: {charactersData.Characters.Count}");
+        }
+
+        if (userData.UserInfo == null)
+        {
+            Debug.Log($"User data is null");
+        }
+        else
+        {
+            Debug.Log($"User data is not null. Display name: {userData.UserInfo.displayName}");
+        }
     }
 
     public void OnChangeDisplayNameButtonClicked()
@@ -105,7 +111,7 @@ public class MainMenu : MonoBehaviour
 
     public void ParseCharacters(GetCurrentCharacterPacket packet)
     {
-        charactersData.Characters = new List<CharacterPacket> { packet.Character };
+        charactersData.Characters.Add(packet.Character); 
         Debug.Log("Number of Character: " + charactersData.Characters.Count);
     }
 

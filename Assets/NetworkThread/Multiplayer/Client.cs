@@ -382,6 +382,7 @@ namespace NetworkThread.Multiplayer
             switch (type)
             {
                 case PacketTypes.Room.JoinRoomPacket:
+                case Room.CreateRoomPacket:
                     packet = new JoinRoomPacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("Room joined");
@@ -444,7 +445,7 @@ namespace NetworkThread.Multiplayer
                     }
                     break;
                 default:
-                    Debug.Log("Unhandled Room message type");
+                    Debug.Log("Unhandled Room message type" + type.ToString());
                     break;
             }
         }

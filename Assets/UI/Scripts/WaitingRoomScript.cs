@@ -170,6 +170,8 @@ public class WaitingRoomScript : MonoBehaviour
             StartCoroutine(ShowErrorPanel("You can't go out because you are ready!"));
             return;
         }
+        roomData.PlayersInRoom.Clear();
+        roomData.RoomPacket = null;
         NetworkStaticManager.ClientHandle.SendExitRoomPacket(_intRoomId);
         SceneManager.LoadScene("Select Play Mode");
     }

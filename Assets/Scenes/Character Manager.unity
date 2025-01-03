@@ -5308,7 +5308,6 @@ MonoBehaviour:
   CharacterInfoTabScript: {fileID: 24999715}
   SelectCharacterPanel: {fileID: 865237368}
   SelectCharacterTabScript: {fileID: 865237370}
-  CharactersData: {fileID: 11400000, guid: bfd2b9f7f3c3d9244939151076fcf1fa, type: 2}
 --- !u!1 &1049480030
 GameObject:
   m_ObjectHideFlags: 0

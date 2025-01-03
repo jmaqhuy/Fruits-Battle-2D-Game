@@ -17,7 +17,6 @@ public class SelectPlayModeScript : MonoBehaviour
     
     [Header("Room List Panel")]
     public GameObject RoomListPanel;
-    private bool getRoomList = true;
     public RectTransform position;
     public GameObject roomInfoPrefab;
     private List<GameObject> _roomInfos = new List<GameObject>();
@@ -27,6 +26,8 @@ public class SelectPlayModeScript : MonoBehaviour
     public Button FindButton;
     public TMPro.TMP_Dropdown RoomModeDropdown;
     public TMPro.TMP_Dropdown RoomTypeDropdown;
+
+    private bool _inProcess = false;
     private void Awake()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
@@ -37,19 +38,19 @@ public class SelectPlayModeScript : MonoBehaviour
     }
     private void ShowRoomList()
     {
-        if (!getRoomList) return;
+        if (_inProcess) return;
         foreach (var r in _roomInfos)
         {
             Destroy(r);
         }
         _roomInfos.Clear();
         NetworkStaticManager.ClientHandle.SendRoomListPacket();
-        getRoomList = false;
+        _inProcess = true;
     }
 
     public void ParseRoomList(RoomListPacket roomListPacket)
     {
-        getRoomList = true;
+        _inProcess = false;
         foreach (var r in roomListPacket.rooms)
         {
             var newButton = Instantiate(roomInfoPrefab, position);
@@ -120,17 +121,42 @@ public class SelectPlayModeScript : MonoBehaviour
 
     public void NormalModeSelected()
     {
+        if (_inProcess) return;
         NetworkStaticManager.ClientHandle.SendJoinRoomPacket(RoomMode.Normal, RoomType.TwoVsTwo);
+        _inProcess = true;
     }
 
     public void ParseRoomInfoData(RoomPacket roomPacket)
     {
+        Debug.Log("Get roomPacket");
         roomData.RoomPacket = roomPacket;
+        try
+        {
+            if (roomData.RoomPacket != null && roomData.PlayersInRoom.Count > 0)
+            {
+                SceneManager.LoadScene("Waiting Room");
+            }
+        }
+        finally
+        {
+            
+        }
     }
 
     public void ParsePlayerInRoomData(JoinRoomPacketToAll packet)
     {
+        Debug.Log("Get JoinRoomPacketToAll");
         roomData.PlayersInRoom = packet.Players;
-        SceneManager.LoadScene("Waiting Room");
+        try
+        {
+            if (roomData.RoomPacket != null && roomData.PlayersInRoom.Count > 0)
+            {
+                SceneManager.LoadScene("Waiting Room");
+            }
+        }
+        finally
+        {
+            
+        }
     }
 }

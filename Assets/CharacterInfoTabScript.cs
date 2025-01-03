@@ -59,8 +59,7 @@ public class CharacterInfoTabScript : MonoBehaviour
     private void Start()
     {
         saveAddPointButton.onClick.AddListener(OnClickSaveAddPoint);
-        character = characterData.Characters
-            .FirstOrDefault(c => c.IsSelected);
+        character = characterData.GetCurrentCharacter();
         Debug.Log("Number of Character: " + characterData.Characters.Count);
     }
 
@@ -107,7 +106,7 @@ public class CharacterInfoTabScript : MonoBehaviour
     {
         characterHp.text = (character.CharacterHp + character.HpPoint * 100).ToString();
         characterDamage.text = (character.CharacterDamage + character.DamagePoint * 10).ToString();
-        characterArmor.text = (character.CharacterArmor + character.ArmorPoint * 10).ToString();
+        characterArmor.text = (character.CharacterArmor + character.ArmorPoint).ToString();
         characterLucky.text = (character.CharacterLuck + character.LuckPoint).ToString();
         characterHp.color = Color.black;
         characterDamage.color = Color.black;
@@ -153,10 +152,10 @@ public class CharacterInfoTabScript : MonoBehaviour
                 value.text = (character.CharacterDamage + currentPoint * 10).ToString();
                 break;
             case 3:
-                value.text = (character.CharacterArmor + currentPoint * 10).ToString();
+                value.text = (character.CharacterArmor + currentPoint).ToString();
                 break;
             case 4:
-                value.text = (character.CharacterLuck + currentPoint * 10).ToString();
+                value.text = (character.CharacterLuck + currentPoint).ToString();
                 break;
         }
         UpdateButtonStates();

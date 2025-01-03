@@ -16,11 +16,6 @@ namespace NetworkThread
             try
             {
                 _loginScenesScript = FindObjectOfType<LoginScenesScript>();
-                Debug.Log($"FindObjectOfType<LoginScenesScript> ({_loginScenesScript})");
-                if (_loginScenesScript == null)
-                {
-                    Debug.Log("LoginScenesScript not found in the scene!");
-                }
             }
             finally
             {
