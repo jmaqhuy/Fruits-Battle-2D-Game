@@ -83,19 +83,12 @@ namespace Code_Battle_System.Character
 
             GameObject Button = GameObject.Find("Pow");
             powerButton = Button.GetComponent<Button>();
-            resetPowerFillAmount();
+            
 
             animator = GetComponent<Animator>();
 
-            GameObject point = GameObject.Find("target");
-            if (point != null)
-            {
-                pointObject = point.transform;
-            }
-            else
-            {
-                Debug.Log("No Point Object Selected");
-            }
+            
+            pointObject = transform.Find("target");
 
             Debug.Log(pointObject.name);
             centerObject = gameObject.transform;
@@ -115,11 +108,7 @@ namespace Code_Battle_System.Character
         // Update is called once per frame
         void Update()
         {
-            if (powerImage.fillAmount >= 1.0F)
-            {
-                powerEffect.SetActive(true);
-                powerButton.onClick.AddListener(OnPowerButtonClicked);
-            }
+           
             //When character in the land, it can move and do other thing.
             if (controllermoving)
             {
@@ -172,16 +161,7 @@ namespace Code_Battle_System.Character
             _Rigidbody2D.MovePosition(_Rigidbody2D.position + _movement * speedMovement * Time.fixedDeltaTime);
 
         }
-        void OnPowerButtonClicked()
-        {
-            resetPowerFillAmount();
-            powerEffect.SetActive(false);
-        }
-        void resetPowerFillAmount()
-        {
-            powerImage.fillAmount = 0;
-        }
-
+        
 
 
 

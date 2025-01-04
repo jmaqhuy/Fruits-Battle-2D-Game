@@ -369,4 +369,17 @@ public class RankScene : MonoBehaviour
         errorPanel.SetActive(false);
     }
 
+    public void ChangeTeam(ChangeTeamPacket packet)
+    {
+        Debug.Log($"Get Change Team Packet. Packet.Team {packet.team}");
+        if (string.IsNullOrEmpty(packet.username))
+        {
+            Debug.Log("Change Team for all");
+            foreach (var pl in roomData.PlayersInRoom)
+            {
+                pl.team = packet.team;
+                Debug.Log($"{pl.displayname} in team {pl.team} now");
+            }
+        }
+    }
 }

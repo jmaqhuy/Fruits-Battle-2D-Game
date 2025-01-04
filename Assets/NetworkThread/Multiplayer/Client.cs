@@ -176,6 +176,7 @@ namespace NetworkThread.Multiplayer
                     Debug.Log("get turn packet");
                     packet = new StartTurnPacket();
                     packet.NetIncomingMessageToPacket(message);
+                    
                     if (_uiScripts is GameBattle gameBattle1)
                     {
                         gameBattle1.GetTurn((StartTurnPacket)packet);
@@ -191,6 +192,7 @@ namespace NetworkThread.Multiplayer
                     
                     break;
                 case PacketTypes.GameBattle.EndGamePacket:
+                    Debug.Log("Get end game packet ");
                     packet = new EndGamePacket();
                     packet.NetIncomingMessageToPacket(message);
                     script = (GameBattle)_uiScripts;
@@ -432,6 +434,16 @@ namespace NetworkThread.Multiplayer
                     {
                         rs.UpdateRoomInfo(((JoinRoomPacket)packet).room);
                     }
+                    break;
+                
+                case Room.ChangeTeamPacket:
+                    packet = new ChangeTeamPacket();
+                    packet.NetIncomingMessageToPacket(message);
+                    if (_uiScripts is RankScene rankScene2)
+                    {
+                        rankScene2.ChangeTeam(((ChangeTeamPacket)packet));
+                    }
+                    
                     break;
                 
                 case PacketTypes.Room.CreateRoomPacket:

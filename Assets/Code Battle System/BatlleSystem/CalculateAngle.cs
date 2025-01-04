@@ -16,8 +16,7 @@ namespace Code_Battle_System.BatlleSystem
 
         private void Start()
         {
-            GameObject point = GameObject.Find("target");
-            target = point.transform;
+            target = transform.Find("target");
             GameObject textObject = GameObject.Find("AngleText");
             angleText = textObject.GetComponent<TextMeshProUGUI>();
         }

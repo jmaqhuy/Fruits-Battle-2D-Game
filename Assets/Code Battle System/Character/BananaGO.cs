@@ -32,26 +32,7 @@ namespace Code_Battle_System.Character
             _calculateAngle = GetComponent<CalculateAngle>();
             animator = GetComponent<Animator>();
             isShoot = false;
-            GameObject point = GameObject.Find("target");
-            if (point != null)
-            {
-                pointObject = point.transform;
-
-            }
-            else
-            {
-                Debug.Log("No Point Object Selected");
-            }
-            
-            bulletPerfab = GameObject.Find("bullet");
-            if (bulletPerfab != null)
-            {
-                Debug.Log("Bullet Perfab Selected");
-            }
-            else
-            {
-                Debug.Log("No Bullet Object Selected");
-            }
+            pointObject = transform.Find("target");
             
         }
 
