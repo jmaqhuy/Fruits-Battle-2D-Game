@@ -7,6 +7,7 @@ using NetworkThread;
 using System.Collections;
 using RoomEnum;
 using Unity.Collections.LowLevel.Unsafe;
+using Random = Unity.Mathematics.Random;
 
 
 namespace Code_Battle_System.Bullet
@@ -34,7 +35,7 @@ namespace Code_Battle_System.Bullet
         public Effect status = Effect.Normal;
         private string shooter;
         private Team team;
-
+        private bool IsUsePower =false;
         private void Awake()
         {
             angle = 0;
@@ -75,6 +76,10 @@ namespace Code_Battle_System.Bullet
 
 
             }
+        }
+        public void setIsUsePower(bool isUsePower)
+        {
+            IsUsePower = isUsePower;
         }
         public void SetAngle(float SetAngle)
         {
@@ -119,7 +124,16 @@ namespace Code_Battle_System.Bullet
                     {
                         takeDame = this.damage - uniEnemy.getArmor();  // Full damage minus armor
                     }
-
+                    if (IsUsePower)
+                    {
+                        takeDame = takeDame * 2;
+                    }
+                    float lucky = (float)uniEnemy.getLucky()/100;
+                    
+                    if (UnityEngine.Random.value <= lucky)
+                    {
+                        takeDame = takeDame * 2;
+                    }
                     // Health calculation after damage
                     if (uniEnemy.getHealthCurrent() <= takeDame)
                     {

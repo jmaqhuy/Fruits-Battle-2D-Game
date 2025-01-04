@@ -54,7 +54,10 @@ public class GameBattle : MonoBehaviour
     private bool Item1IsUsed = false;
     private bool Item2IsUsed = false;
     private bool IsUsedItem = false;
-    
+    public Image PowerImage;
+    private bool PowerIsFull = false;
+    private bool isUsePower = false;
+    public GameObject powerEffect;
     private void Awake()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
@@ -73,6 +76,18 @@ public class GameBattle : MonoBehaviour
     {
         Debug.Log("OK");
         Debug.Log($"Start Scene Battle. Number of players: {roomData.PlayersInRoom.Count}");
+    }
+    public void OnPowerButtonPressed()
+    {
+        if (PowerIsFull)
+        {
+            isUsePower = true;
+            PowerIsFull = false;
+            PowerImage.fillAmount = 0f; 
+            Debug.Log(isUsePower + " use power ");
+            powerEffect.SetActive(false);
+        }
+        
     }
 
     public void EndGame(EndGamePacket packet)
@@ -103,7 +118,7 @@ public class GameBattle : MonoBehaviour
             BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(155,32,6,255);
         }
 
-        if (character.CharacterXp >= (int)Math.Pow(character.CharacterLevel, 1.5) * 100) character.CharacterLevel += 1;
+        
         if (Players[NetworkStaticManager.ClientHandle.GetUsername()] != null)
         {
             MonoBehaviour[] components = Players[NetworkStaticManager.ClientHandle.GetUsername()].GetComponents<MonoBehaviour>();
@@ -130,11 +145,22 @@ public class GameBattle : MonoBehaviour
         while (ExpSlider.value < character.CharacterXp)
         {
             ExpText.text = $"{++ExpSlider.value}/{maxXP}";
+            if (character.CharacterXp >= maxXP)
+            {
+                LevelText.text = $"Level: {++character.CharacterLevel}";
+                maxXP = (int)Math.Pow(character.CharacterLevel, 1.5) * 100;
+                ExpSlider.maxValue = maxXP;
+            }
             yield return new WaitForSeconds(0.07f);
         }
     }
     public void BackToRoom()
     {
+        if (roomData.RoomPacket.roomMode == RoomMode.Rank)
+        {
+            SceneManager.LoadScene("Rank");
+            return;
+        }
         SceneManager.LoadScene("Waiting Room");
         Debug.Log($"End Scene Battle. Number of players: {roomData.PlayersInRoom.Count}");
     }
@@ -247,6 +273,20 @@ public class GameBattle : MonoBehaviour
         blinkNameCoroutine = StartCoroutine(BlinkName(_currentPlayerName));
        
         focusCamera.Follow = Players[packet.playerName].transform;
+        if (NetworkStaticManager.ClientHandle.GetUsername() == packet.playerName)
+        {
+            PowerImage.fillAmount += 0.1f;
+            if (PowerImage.fillAmount >= 1f)
+            {
+                PowerIsFull = true;
+                powerEffect.SetActive(true);
+            }
+        }
+
+        if (isUsePower)
+        {
+            isUsePower = false;
+        }
 
 
     }
@@ -298,7 +338,11 @@ public class GameBattle : MonoBehaviour
             mainBullet.SetShooter(packet.playerName);
             mainBullet.setTeam(script.getTeam());
             mainBullet.setDamage(script.getAttack());
-
+            if (NetworkStaticManager.ClientHandle.GetUsername() == packet.playerName)
+            {
+                mainBullet.setIsUsePower(isUsePower);
+                Debug.Log($"Player {packet.playerName} is use power"+isUsePower);
+            }
         }
         if (clockCoroutine != null)
         {
@@ -332,12 +376,29 @@ public class GameBattle : MonoBehaviour
     public void UpdateHP(HealthPointPacket packet)
     {
         Unit script = Players[packet.PlayerName].GetComponent<Unit>();
-        createUpdateHpText(packet.HP-script.getHealthCurrent(),Players[packet.PlayerName]);
+
         if (script != null)
         {
+
+
+            if (NetworkStaticManager.ClientHandle.GetUsername() == packet.PlayerName)
+            {
+                if (script.getHealthCurrent() - packet.HP > 0)
+                {
+                    float power = (float)(script.getHealthCurrent() - packet.HP) / script.getHealthMax();
+                    PowerImage.fillAmount = Mathf.Clamp(PowerImage.fillAmount + power, 0f, 1f);
+                    if (PowerImage.fillAmount >= 1f)
+                    {
+                        PowerIsFull = true;
+                    }
+                }
+
+            }
+
+            createUpdateHpText(packet.HP - script.getHealthCurrent(), Players[packet.PlayerName]);
             script.setHealthCurrent(packet.HP);
         }
-       
+
     }
     public void createUpdateHpText(int takeDamage,GameObject player)
     {

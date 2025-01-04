@@ -2237,7 +2237,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 1
-  m_FillAmount: 0.34
+  m_FillAmount: 0
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -3444,7 +3444,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1308557024}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b32b22f1cd600e044b1f18a212fbd0c8, type: 3}
   m_Name: 
@@ -4963,6 +4963,8 @@ MonoBehaviour:
   positionsData: {fileID: 11400000, guid: a4794eaf0a6dbcd4bb36e8b4900b85b6, type: 2}
   roomData: {fileID: 11400000, guid: 38437d3129f72ad4cafb1b2d2534a752, type: 2}
   charactersData: {fileID: 11400000, guid: bfd2b9f7f3c3d9244939151076fcf1fa, type: 2}
+  PowerImage: {fileID: 873060067}
+  powerEffect: {fileID: 1066543495}
 --- !u!1 &1840728192
 GameObject:
   m_ObjectHideFlags: 0
@@ -5929,7 +5931,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1823753548}
+        m_TargetAssemblyTypeName: GameBattle, Assembly-CSharp
+        m_MethodName: OnPowerButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
