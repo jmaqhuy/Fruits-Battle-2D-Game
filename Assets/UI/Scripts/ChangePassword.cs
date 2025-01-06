@@ -19,26 +19,14 @@ public class ChangePassword : MonoBehaviour
     public GameObject settingsPanel;
     private void Awake()
     {
-        Debug.Log($"Scene {SceneManager.GetActiveScene().name}");
         RegisterButtonClicked();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        NetworkStaticManager.ClientHandle.SetUiScripts(this);
-        NetworkStaticManager.ClientHandle.GetScriptNameNow();
-    }
     private void RegisterButtonClicked()
     {
         changePasswordButton.onClick.AddListener(OnClickChangePasswordButton);
-      
     }
 
-    private void OnClickBackButton()
-    {
-        SceneManager.LoadScene("Main Menu");
-    }
    
    
     private void OnClickChangePasswordButton()

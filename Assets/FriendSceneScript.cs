@@ -17,6 +17,7 @@ public class FriendSceneScript : MonoBehaviour
     public Button SentRequestButton;
     public Button SearchFriendsButton;
     public Button BlockFriendsButton;
+    public TextMeshProUGUI TabName;
 
     [Header("All Friend Tab")]
     public GameObject AllFriendTab;
@@ -65,6 +66,7 @@ public class FriendSceneScript : MonoBehaviour
     {
         ColorUtility.TryParseHtmlString("#06A6E7", out defaultButtonColor);
         ColorUtility.TryParseHtmlString("#D46613", out activeButtonColor);
+        TabName.text = "All Friends";
         buttonTabMap = new Dictionary<Button, GameObject>()
         {
             { AllFriendsButton, AllFriendTab },
@@ -127,26 +129,31 @@ public class FriendSceneScript : MonoBehaviour
         if (activeTab == AllFriendTab)
         {
             Debug.Log("AllFriend Tab Active");
+            TabName.text = "All Friends";
             GetAllFriend();
         }
         if (activeTab == FriendRequestTab)
         {
             Debug.Log("FriendRequest Tab Active");
+            TabName.text = "Friend Requests";
             GetFriendRequestFriend();
         }
         if (activeTab == SentRequestTab)
         {
             Debug.Log("SentRequest Tab Active");
+            TabName.text = "Sent Requests";
             GetSentRequestFriend();
         }
         if (activeTab == SearchTab)
         {
             Debug.Log("Search Tab Active");
+            TabName.text = "Search Tab";
             GetSuggestFriend();
         }
         if (activeTab == BlockFriendTab)
         {
             Debug.Log("BlockFriend Tab Active");
+            TabName.text = "Block Friends";
             GetBlockFriend();
         }
     }

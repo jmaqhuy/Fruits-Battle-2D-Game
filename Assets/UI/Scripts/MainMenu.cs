@@ -35,8 +35,10 @@ public class MainMenu : MonoBehaviour
     public GameObject stars;
     public GameObject starIcon;
     private List<GameObject> starList = new List<GameObject>();
-   
-
+    
+    [Header("Change Password")]
+    public ChangePassword changePassword;
+    
     // Start is called before the first frame update
 
     void Awake()
@@ -66,6 +68,15 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    public void ShowChangePasswordDone()
+    {
+        changePassword.ShowChangePasswordDone();
+    }
+
+    public void ShowChangePasswordFailed()
+    {
+        changePassword.ShowChangePasswordFailed();
+    }
     public void OnChangeDisplayNameButtonClicked()
     {
         NetworkStaticManager.ClientHandle.SendChangeDisplayNamePacket(newDisplayName.text);

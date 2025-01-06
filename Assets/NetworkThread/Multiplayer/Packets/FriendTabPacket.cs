@@ -6,11 +6,13 @@ namespace NetworkThread.Multiplayer.Packets
     {
         public string FriendUsername;
         public string FriendDisplayName;
+        public bool FriendIsOnline;
 
         public void Serialize(NetOutgoingMessage message)
         {
             message.Write(FriendUsername);
             message.Write(FriendDisplayName);
+            message.Write(FriendIsOnline);
         }
 
         public static FriendTabPacket Deserialize(NetIncomingMessage message)
@@ -19,6 +21,7 @@ namespace NetworkThread.Multiplayer.Packets
             {
                 FriendUsername = message.ReadString(),
                 FriendDisplayName = message.ReadString(),
+                FriendIsOnline = message.ReadBoolean(),
             };
         }
     }

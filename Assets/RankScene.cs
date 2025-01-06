@@ -105,6 +105,10 @@ public class RankScene : MonoBehaviour
 
     private IEnumerator CountDownMatchFound()
     {
+        foreach (var pl in roomData.PlayersInRoom)
+        {
+            Debug.Log($"Player {pl.displayname} in team {pl.team}");
+        }
         matchFoundPanel.SetActive(true);
         var timeCounter = 6;
         while (timeCounter-- > 0)

@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using DataTransfer;
-using UnityEngine.Serialization;
 
 public class WaitingRoomScript : MonoBehaviour
 {
@@ -53,6 +52,10 @@ public class WaitingRoomScript : MonoBehaviour
     public GameObject errorPanel;
     int counter = 0;
 
+    [Header("Friend Panel")] 
+    public Transform FriendPanel;
+    public GameObject FriendPrefab;
+
     void Awake()
     {
         foreach (var player in playerList)
@@ -79,6 +82,8 @@ public class WaitingRoomScript : MonoBehaviour
         ReadyButton.onClick.AddListener(PlayerReadyClick);
         StartButton.onClick.AddListener(StartGameButtonClick);
         Debug.Log($"Start Scene Waiting Room. Number of players: {roomData.PlayersInRoom.Count}");
+        NetworkStaticManager.ClientHandle.SendAllFriendPacket();
+        
     }
 
     private void StartGameButtonClick()
@@ -317,5 +322,17 @@ public class WaitingRoomScript : MonoBehaviour
             player.isReady = false;
         }
         SceneManager.LoadScene("Normal Mode Map");
+    }
+
+    public void ParseAllFriendInfo(AllFriendPacket packet)
+    {
+        foreach (var fr in packet.Friends)
+        {
+            GameObject newFriend = Instantiate(FriendPrefab, FriendPanel);
+            FriendPanel tabInfo = newFriend.GetComponent<FriendPanel>();
+            tabInfo.FriendUsername = fr.FriendUsername;
+            tabInfo.FriendDisplayName.text = fr.FriendDisplayName;
+            tabInfo.SetFriendOnline(fr.FriendIsOnline);
+        }
     }
 }

@@ -24,9 +24,10 @@ namespace RoomEnum
         FourVsFour = 8,
     }
     
-    public enum Team
+    public enum Team : byte
     {
-        Team1, Team2
+        Team1 = 0,
+        Team2 = 1
     }
     
     

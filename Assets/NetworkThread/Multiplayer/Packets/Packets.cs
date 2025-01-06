@@ -1028,17 +1028,20 @@ namespace NetworkThread.Multiplayer
         public Team team { get; set; }
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
+            team = (Team)message.ReadByte();
             username = message.ReadString();
             roomId = message.ReadInt16();
-            team = (Team)message.ReadByte();
+            
+            Debug.Log($"Received change team packet {team}");
         }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
             message.Write((byte)PacketTypes.Room.ChangeTeamPacket);
+            message.Write((byte)team);
             message.Write(username);
             message.Write(roomId);
-            message.Write((byte)team);
+            
         }
     }
 }

@@ -326,8 +326,13 @@ namespace NetworkThread.Multiplayer
                     packet = new AllFriendPacket();
                     packet.NetIncomingMessageToPacket(message);
                     Debug.Log("All friend packet received from server");
-                    scriptNow = (FriendSceneScript)_uiScripts;
-                    scriptNow.ParseAllFriendInfo((AllFriendPacket)packet);
+                    if (_uiScripts is FriendSceneScript Fsscript)
+                    {
+                        Fsscript.ParseAllFriendInfo((AllFriendPacket)packet);
+                    } else if (_uiScripts is WaitingRoomScript WsScript)
+                    {
+                        WsScript.ParseAllFriendInfo((AllFriendPacket)packet);
+                    }
                     break;
                 case PacketTypes.Friend.FriendRequestPacket:
                     packet = new FriendRequestPacket();
@@ -657,14 +662,13 @@ namespace NetworkThread.Multiplayer
                     
                     packet = new ChangePassword();
                     packet.NetIncomingMessageToPacket(message);
-                    var changePass = (global::ChangePassword)_uiScripts;
                     if (((ChangePassword)packet).isSuccess)
                     {
-                        changePass.ShowChangePasswordDone();
+                        ((MainMenu)_uiScripts).ShowChangePasswordDone();
                     }
                     else 
                     {
-                        changePass.ShowChangePasswordFailed();
+                        ((MainMenu)_uiScripts).ShowChangePasswordFailed();
                     }
                     
                     break;

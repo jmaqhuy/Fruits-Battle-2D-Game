@@ -337,8 +337,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FriendAvatar: {fileID: 6991076894201678895}
-  FriendName: {fileID: 3565779776425176786}
-  OnlineStatusPanel: {fileID: 3541474873441936298}
+  FriendDisplayName: {fileID: 3565779776425176786}
+  FriendUsername: 
+  FriendOnline: {fileID: 3742991946696721855}
+  FriendOffline: {fileID: 5826230463000783453}
   InviteFriendButton: {fileID: 6938338210219445957}
 --- !u!1 &1463451752332710519
 GameObject:
