@@ -979,6 +979,7 @@ namespace NetworkThread.Multiplayer
     public class CurrentRankPacket : Packet
     {
         public string username { get; set; }
+        public int rankId { get; set; }
         public string rankName { get; set; } 
         public string rankAssetName { get; set; }
         public int currentStar {  get; set; }
@@ -987,6 +988,7 @@ namespace NetworkThread.Multiplayer
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
             username = message.ReadString();
+            rankId = message.ReadInt32();
             rankName = message.ReadString();
             rankAssetName = message.ReadString();
             currentStar = message.ReadInt32();

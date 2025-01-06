@@ -41,9 +41,11 @@ public class GameBattle : MonoBehaviour
     public GameObject characterController;
     // Ensure this is assigned in the Inspector
     public Dictionary<string, GameObject> Players;
+    [Header("Data")]
     public PositionsData positionsData;
     public RoomData roomData;
     public CharactersData charactersData;
+    public UserData userData;
     private Team _myTeam;
     private Coroutine clockCoroutine;
     private Coroutine blinkNameCoroutine;
@@ -99,7 +101,6 @@ public class GameBattle : MonoBehaviour
         ExpText.text = $"{character.CharacterXp}/{maxXP}";
         ExpSlider.maxValue = maxXP;
         ExpSlider.value = character.CharacterXp;
-        
         Debug.Log("my team is "+_myTeam) ;
         if(packet.TeamWin == _myTeam)
         {
@@ -107,6 +108,21 @@ public class GameBattle : MonoBehaviour
             DefeatPanel.SetActive(false);
             
             character.CharacterXp += 45;
+            if (roomData.RoomPacket.roomMode == RoomMode.Rank)
+            {
+                var rankModel = RankStatic.RankModels.FirstOrDefault(r => r.Id == userData.CurrentRank.rankId);
+                if (rankModel != null)
+                {
+                    ++userData.CurrentRank.currentStar;
+                    if (userData.CurrentRank.currentStar > rankModel.MaxStar && rankModel.MaxStar != 0)
+                    {
+                        userData.CurrentRank.rankId++;
+                        userData.CurrentRank.currentStar = 1;
+                        userData.CurrentRank.rankName = rankModel.Name;
+                        userData.CurrentRank.rankAssetName = rankModel.AssetName;
+                    }
+                }
+            }
             BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(6,138,22,255);
         }
         else
@@ -115,6 +131,26 @@ public class GameBattle : MonoBehaviour
             DefeatPanel.SetActive(true);
             
             character.CharacterXp += 30;
+            if (roomData.RoomPacket.roomMode == RoomMode.Rank)
+            {
+                --userData.CurrentRank.currentStar;
+                if (userData.CurrentRank.currentStar < 0)
+                {
+                    if (userData.CurrentRank.rankId == 1)
+                    {
+                        userData.CurrentRank.currentStar = 0;
+                    }
+                    else
+                    {
+                        userData.CurrentRank.rankId--;
+                        var rankModel = RankStatic.RankModels
+                            .FirstOrDefault(r => r.Id == userData.CurrentRank.rankId);
+                        userData.CurrentRank.currentStar = --rankModel.MaxStar;
+                        userData.CurrentRank.rankName = rankModel.Name;
+                        userData.CurrentRank.rankAssetName = rankModel.AssetName;
+                    }
+                }
+            }
             BackToWaitingRoomButton.GetComponent<Image>().color = new Color32(155,32,6,255);
         }
 
