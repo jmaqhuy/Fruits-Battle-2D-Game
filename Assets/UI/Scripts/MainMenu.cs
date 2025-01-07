@@ -189,6 +189,7 @@ public class MainMenu : MonoBehaviour
     {
         NetworkStaticManager.ClientHandle.SendLogoutPacket();
         charactersData.Characters.Clear();
+        PlayerPrefs.DeleteAll();
         SceneManager.LoadScene("Login");
     }
 

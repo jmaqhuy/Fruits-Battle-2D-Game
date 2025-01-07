@@ -58,7 +58,7 @@ namespace NetworkThread
             else if (NetworkStaticManager.ClientHandle.IsConnected() && IsConnecting)
             {
                 IsConnecting = false;
-                _loginScenesScript.ShowLoginPanel();
+                _loginScenesScript.LoginUsingPlayerPref();
             }
         }
 
@@ -83,6 +83,7 @@ namespace NetworkThread
                 NetworkStaticManager.ClientHandle.SendDisconnect();
             }
             Debug.Log("Game manager quit successfully.");
+            PlayerPrefs.Save();
         }
     }
 }

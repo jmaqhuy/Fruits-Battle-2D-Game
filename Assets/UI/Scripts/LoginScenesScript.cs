@@ -60,6 +60,10 @@ public class LoginScenesScript : MonoBehaviour
     public GameObject processingAnimation;
     public TextMeshProUGUI loadingText;
 
+    private string playerPrefUsername;
+    private string playerPrefPassword;
+    private bool loginUsingPlayerPref = false;
+
     
     private string _tmpUsername;
     private void Awake()
@@ -79,6 +83,7 @@ public class LoginScenesScript : MonoBehaviour
         passwordText_signUp.text = "";
         errorText_signUp.text = "";
         emailText_signUp.text = "";
+        PlayerPrefs.DeleteAll();
         
     }
 
@@ -93,6 +98,25 @@ public class LoginScenesScript : MonoBehaviour
         loadingText.text = "";
         ShowLoginPanel();
     }
+
+    public void LoginUsingPlayerPref()
+    {
+        string appDirectory = Application.persistentDataPath;
+        Debug.Log(appDirectory);
+        playerPrefUsername = PlayerPrefs.GetString(appDirectory + "PlayerName", "");
+        playerPrefPassword = PlayerPrefs.GetString(appDirectory + "PlayerPassword", "");
+        Debug.Log(playerPrefUsername + playerPrefPassword);
+        if (playerPrefUsername != "" && playerPrefPassword != "")
+        {
+            ShowLoadingPanel("Login");
+            NetworkStaticManager.ClientHandle.SendLoginPackage(playerPrefUsername, playerPrefPassword);
+            loginUsingPlayerPref = true;
+        }
+        else
+        {
+            ShowLoginPanel();
+        }
+    }
     
     public void OnLoginButtonClicked()
     {
@@ -103,6 +127,10 @@ public class LoginScenesScript : MonoBehaviour
         {
             ShowLoadingPanel("Login");
             NetworkStaticManager.ClientHandle.SendLoginPackage(username, password);
+            loginUsingPlayerPref = false;
+            string appDirectory = Application.persistentDataPath;
+            PlayerPrefs.SetString(appDirectory + "PlayerName", username);
+            PlayerPrefs.SetString(appDirectory + "PlayerPassword", password);
         }
         else
         {
@@ -215,11 +243,17 @@ public class LoginScenesScript : MonoBehaviour
         ShowSuccessPanel(NetworkStaticManager.ClientHandle.GetUsername());
         NetworkStaticManager.ClientHandle.RequestBasicUserInfo();
         NetworkStaticManager.ClientHandle.GetUserCurrentRank();
+        
     }
 
     public void LoginFail(string reason)
     {
+        if (loginUsingPlayerPref)
+        {
+            return;
+        }
         ShowLoginPanel(reason);
+        PlayerPrefs.DeleteAll();
     }
     
     public void SignUpFail(string error)
