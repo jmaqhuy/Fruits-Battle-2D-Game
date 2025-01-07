@@ -46,9 +46,10 @@ namespace DataTransfer
 
     public class RankModel
     {
-        public int Id;
-        public int MaxStar;
-        public string Name;
-        public string AssetName;
+        public int Id { get; set; }
+        public int MaxStar { get; set; }
+        public string Name { get; set; }
+        public string AssetName { get; set; }
     }
+
 }

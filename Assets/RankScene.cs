@@ -50,6 +50,7 @@ public class RankScene : MonoBehaviour
     [Header("Match Found Panel")]
     public GameObject matchFoundPanel;
     public TextMeshProUGUI matchFoundText;
+    public TextMeshProUGUI waitAnotherPlayer;
     
     
     
@@ -58,7 +59,7 @@ public class RankScene : MonoBehaviour
     void Start()
     {
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
-        
+        Debug.Log($"Rank: {userData.CurrentRank.rankName} {userData.CurrentRank.currentStar}");
         uiAnimation.Add(RoomType.FourVsFour, new Vector3(1, 1, 1));
         uiAnimation.Add(RoomType.OneVsOne, new Vector3(1.45f, 1.45f, 1.45f));
         uiAnimation.Add(RoomType.TwoVsTwo, new Vector3(1.3f, 1.3f, 1.3f));
@@ -105,6 +106,7 @@ public class RankScene : MonoBehaviour
 
     private IEnumerator CountDownMatchFound()
     {
+        waitAnotherPlayer.gameObject.SetActive(false);
         foreach (var pl in roomData.PlayersInRoom)
         {
             Debug.Log($"Player {pl.displayname} in team {pl.team}");
@@ -117,6 +119,22 @@ public class RankScene : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         NetworkStaticManager.ClientHandle.SendStartGamePacket(roomData.RoomPacket.Id);
+        int i = -1;
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            if (i == -1)
+            {
+                yield return new WaitForSeconds(3);
+            }
+            else
+            {
+                waitAnotherPlayer.gameObject.SetActive(true);
+                waitAnotherPlayer.text = $"Waiting for other players{new string('.', i)}";
+                
+            }
+            i = i == 3 ? i=0 : i+1;
+        }
     }
     public void ReceiveStartGame(SpawnPlayerPacketToAll packet)
     {

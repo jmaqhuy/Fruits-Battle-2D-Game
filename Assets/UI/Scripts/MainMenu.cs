@@ -123,6 +123,7 @@ public class MainMenu : MonoBehaviour
 
     public void ShowMyProfile()
     {
+        Debug.Log($"Rank: {userData.CurrentRank.rankName} {userData.CurrentRank.currentStar}");
         displayNameProfile.text = displayName.text;starIcon.SetActive(true);
         displayNameProfile.text = displayName.text;
         characterNumber.text = charactersData.Characters.Count.ToString();

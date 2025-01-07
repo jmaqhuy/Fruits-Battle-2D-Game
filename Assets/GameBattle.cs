@@ -111,12 +111,15 @@ public class GameBattle : MonoBehaviour
             if (roomData.RoomPacket.roomMode == RoomMode.Rank)
             {
                 var rankModel = RankStatic.RankModels.FirstOrDefault(r => r.Id == userData.CurrentRank.rankId);
+                
                 if (rankModel != null)
                 {
+                    Debug.Log($"Rank id: {rankModel.Id} {rankModel.Name} {rankModel.MaxStar} ");
                     ++userData.CurrentRank.currentStar;
                     if (userData.CurrentRank.currentStar > rankModel.MaxStar && rankModel.MaxStar != 0)
                     {
                         userData.CurrentRank.rankId++;
+                        rankModel = RankStatic.RankModels.FirstOrDefault(r => r.Id == userData.CurrentRank.rankId);
                         userData.CurrentRank.currentStar = 1;
                         userData.CurrentRank.rankName = rankModel.Name;
                         userData.CurrentRank.rankAssetName = rankModel.AssetName;

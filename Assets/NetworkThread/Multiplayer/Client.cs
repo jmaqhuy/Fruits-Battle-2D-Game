@@ -35,7 +35,6 @@ namespace NetworkThread.Multiplayer
             
             while ((message = client.ReadMessage()) != null)
             {
-                Debug.Log("Message received from server");
                 switch (message.MessageType)
                 {
                     case NetIncomingMessageType.DiscoveryResponse:
@@ -570,8 +569,8 @@ namespace NetworkThread.Multiplayer
 
         public void DiscoveryServer()
         {
-            /*client.DiscoverLocalPeers(14242);*/
-            client.Connect("35.232.232.21", 14242);
+            client.DiscoverLocalPeers(14242);
+            /*client.Connect("35.232.232.21", 14242);*/
         }
 
 
