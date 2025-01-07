@@ -125,6 +125,7 @@ public class MainMenu : MonoBehaviour
     {
         displayNameProfile.text = displayName.text;starIcon.SetActive(true);
         displayNameProfile.text = displayName.text;
+        characterNumber.text = charactersData.Characters.Count.ToString();
         Sprite rIcon = ResourceLoader.LoadRankSprite(userData.CurrentRank.rankAssetName);
         Debug.Log(userData.CurrentRank.rankAssetName);
         if (rIcon != null)

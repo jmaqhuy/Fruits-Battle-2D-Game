@@ -217,9 +217,9 @@ public class LoginScenesScript : MonoBehaviour
         NetworkStaticManager.ClientHandle.GetUserCurrentRank();
     }
 
-    public void LoginFail()
+    public void LoginFail(string reason)
     {
-        ShowLoginPanel("Login failed");
+        ShowLoginPanel(reason);
     }
     
     public void SignUpFail(string error)
