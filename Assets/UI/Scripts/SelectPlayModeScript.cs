@@ -12,7 +12,6 @@ using UnityEngine.UI;
 public class SelectPlayModeScript : MonoBehaviour
 {
     public RoomData roomData;
-    public RoomsData roomsData;
     public Button ShowRoomsButton;
     public Button ReloadRoomListButton;
     
@@ -80,6 +79,13 @@ public class SelectPlayModeScript : MonoBehaviour
         
         UpdateRoomList(0);
         RoomListPanel.SetActive(true);
+    }
+
+    public void CustomModeSelected()
+    {
+        if (_inProcess) return;
+        NetworkStaticManager.ClientHandle.CreateNewRoom(RoomMode.Normal, RoomType.TwoVsTwo);
+        _inProcess = true;
     }
 
     private void UpdateRoomList(int value)

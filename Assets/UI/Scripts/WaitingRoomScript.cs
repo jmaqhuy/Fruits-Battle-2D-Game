@@ -16,6 +16,7 @@ public class WaitingRoomScript : MonoBehaviour
     public Button buttonBack;
     public RoomData roomData;
     public PositionsData positionsData;
+    public UserData userData;
     
     [Header("Room Info")]
     public TextMeshProUGUI RoomId;
@@ -24,6 +25,7 @@ public class WaitingRoomScript : MonoBehaviour
     public TextMeshProUGUI roomType;
     public RoomModeUI roomModeUI;
     public RoomMode roomMode; 
+    public TextMeshProUGUI coin;
     
     [Header("Players")]
     public GameObject[] playerList;
@@ -42,10 +44,13 @@ public class WaitingRoomScript : MonoBehaviour
     [Header("Host Panel")]
     public GameObject hostPanel;
     public Button StartButton;
+    public TMP_Dropdown gameTypeDropdown;
+    private int _currentDropdownValue;
     
     [Header("Guest Panel")]
     public GameObject guestPanel;
     public Button ReadyButton;
+    public Button ChangeTeamButton;
     
     private bool _isReady = false;
     [Header("Error Panel")]
@@ -55,6 +60,8 @@ public class WaitingRoomScript : MonoBehaviour
     [Header("Friend Panel")] 
     public Transform FriendPanel;
     public GameObject FriendPrefab;
+    
+    private Team _myTeam;
 
     void Awake()
     {
@@ -71,10 +78,9 @@ public class WaitingRoomScript : MonoBehaviour
             PasteRoomInfo(roomData.RoomPacket);
             SetUIForAll(roomData.PlayersInRoom);
         }
-        /*else
-        {
-            NetworkStaticManager.ClientHandle.SendJoinRoomPacket(RoomMode.Normal, RoomType.TwoVsTwo);
-        }*/
+
+        gameTypeDropdown.value = 1;
+        gameTypeDropdown.onValueChanged.AddListener(OnGameTypeDropdownValueChanged);
         NetworkStaticManager.ClientHandle.SetUiScripts(this);
         buttonBack.onClick.AddListener(OnButtonBackClick);
         Item1.onClick.AddListener(() => OnItemClick(1));
@@ -83,7 +89,46 @@ public class WaitingRoomScript : MonoBehaviour
         StartButton.onClick.AddListener(StartGameButtonClick);
         Debug.Log($"Start Scene Waiting Room. Number of players: {roomData.PlayersInRoom.Count}");
         NetworkStaticManager.ClientHandle.SendAllFriendPacket();
-        
+        _currentDropdownValue = gameTypeDropdown.value;
+        coin.text = userData.UserInfo.coin.ToString();
+        ChangeTeamButton.onClick.AddListener(OnChangeTeamClick);
+    }
+
+    private void OnChangeTeamClick()
+    {
+        NetworkStaticManager.ClientHandle.SendChangeTeamPacket(roomData.RoomPacket.Id, _myTeam, userData.UserInfo.userName );
+    }
+
+    private void OnGameTypeDropdownValueChanged(int arg0)
+    {
+        Debug.Log($"Number of player in room: {roomData.PlayersInRoom.Count}");
+        switch (gameTypeDropdown.value)
+        {
+            case 0:
+                if (roomData.PlayersInRoom.Count > 2)
+                {
+                    StartCoroutine(ShowErrorPanel("There is more than two player in the room"));
+                    gameTypeDropdown.value = _currentDropdownValue;
+                    return;
+                }
+
+                roomData.RoomPacket.roomType = RoomType.OneVsOne;
+                break;
+            case 1:
+                if (roomData.PlayersInRoom.Count > 4)
+                {
+                    StartCoroutine(ShowErrorPanel("There is more than four player in the room"));
+                    gameTypeDropdown.value = _currentDropdownValue;
+                    return;
+                }
+                roomData.RoomPacket.roomType = RoomType.TwoVsTwo;
+                break;
+            case 2:
+                roomData.RoomPacket.roomType = RoomType.FourVsFour;
+                break;
+        }
+        NetworkStaticManager.ClientHandle.SendChangeRoomTypePacket(roomData.RoomPacket);
+        _currentDropdownValue = gameTypeDropdown.value;
     }
 
     private void StartGameButtonClick()
@@ -147,6 +192,7 @@ public class WaitingRoomScript : MonoBehaviour
     {
         Debug.Log("Player Ready");
         _isReady = !_isReady;
+        ChangeTeamButton.interactable = !_isReady;
         NetworkStaticManager.ClientHandle.SendPlayerReadyPacket(_intRoomId, _isReady);
     }
 
@@ -198,6 +244,7 @@ public class WaitingRoomScript : MonoBehaviour
         SetRoomName(room.Name);
         roomModeUI.SetBannerRoomMode(room.roomMode);
         SetRoomType(room.roomType);
+        roomData.RoomPacket = room;
     }
 
     private void SetRoomType(RoomType rT)
@@ -256,7 +303,7 @@ public class WaitingRoomScript : MonoBehaviour
         foreach (var player in players)
         {
             Debug.Log($"Player Team: {player.team}, Player Position: {player.Position}");
-            SetPlayerDetails(playerList[player.Position - 1].GetComponent<PlayerInWaitingRoom>(), player);
+            SetPlayerDetails(playerList[player.Position - 1].GetComponent<PlayerInWaitingRoom>(), player, player.Position);
             playerList[player.Position - 1 ].SetActive(true);
         }
 
@@ -271,7 +318,7 @@ public class WaitingRoomScript : MonoBehaviour
         }
     }
 
-    private void SetPlayerDetails(PlayerInWaitingRoom ui, PlayerInRoomPacket data)
+    private void SetPlayerDetails(PlayerInWaitingRoom ui, PlayerInRoomPacket data, int playerIndex)
     {
         ui.username = data.username;
         if (ui.username == NetworkStaticManager.ClientHandle.GetUsername())
@@ -290,6 +337,8 @@ public class WaitingRoomScript : MonoBehaviour
                 ReadyButton.GetComponent<Image>().color = new Color32(0, 135, 10, 255);
                 ReadyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready";
             }
+
+            _myTeam = playerIndex <= 4 ? Team.Team1 : Team.Team2;
         }
         
         ui.isHost.SetActive(data.isHost);

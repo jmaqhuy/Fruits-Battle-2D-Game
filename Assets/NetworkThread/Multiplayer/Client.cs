@@ -538,6 +538,19 @@ namespace NetworkThread.Multiplayer
             client.FlushSendQueue();
             
         }
+
+        public void SendChangeTeamPacket(int roomId, Team team, string username)
+        {
+            NetOutgoingMessage msg = client.CreateMessage();
+            new ChangeTeamPacket()
+            {
+                roomId = roomId,
+                team = team,
+                username = username
+            }.PacketToNetOutGoingMessage(msg);
+            client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+            client.FlushSendQueue();
+        }
         public void SendMatchmakingPacket(int intRoomId, bool isStart)
         {
             NetOutgoingMessage message = client.CreateMessage();
